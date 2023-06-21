@@ -1,0 +1,4 @@
+gTTS
+discord.py[voice]
+openai
+tiktoken
