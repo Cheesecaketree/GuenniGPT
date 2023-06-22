@@ -31,6 +31,7 @@ mp3_audio_config = tts.AudioConfig(
 
 
 def generate(text, filename, language):
+    logging.debug("Generating audio with Google Cloud")
     voice = tts.VoiceSelectionParams(
         language_code=language,
         ssml_gender=tts.SsmlVoiceGender.FEMALE,
@@ -44,8 +45,8 @@ def generate(text, filename, language):
     
     
 def generate_gtts(pText, filename, language): 
-    logging.info(f"Generating voice in lang {language}, Text: {pText}")
+    logging.debug("Generating audio with gTTs")
     nachricht = gTTS(text=pText, lang=language, slow=False)
     filename = filename
     nachricht.save(filename)
-    logging.info(f"{filename} created")
+    logging.info(f"Audio content written to file {filename}")
