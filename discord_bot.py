@@ -23,12 +23,9 @@ bot = commands.Bot(command_prefix='?', description=description, intents=intent)
 @bot.event
 async def on_ready():
     time_str = datetime.datetime.now().strftime("%H:%M")
-    print(f'it is {time_str}')
-    print('Logged in as')
-    print(bot.user.name)
-    print(bot.user.id)
-    print('------')
     logging.info(f"--- Bot ready at {time_str} ---")
+    
+        
 
 
 # eventcontrolled functions
