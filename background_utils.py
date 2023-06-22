@@ -5,9 +5,6 @@ import logging
 import os
 import tiktoken
 
-from gtts import gTTS
-import ai_requests
-
 
 logging.basicConfig(format='%(asctime)s | %(name)s | %(levelname)s | %(message)s', filename="logfile.log", level=logging.INFO)
 
@@ -15,33 +12,12 @@ def count_tokens(text):
     encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
     tokens_integer = encoding.encode(text)
     number_of_tokens = len(tokens_integer)
+    return number_of_tokens
     
 
 def get_json(path):
     with open(path, "r") as f:
         return json.load(f)
-    
-    
-def generate_greeting(name, channel, language):
-    name = name.split("#")[0]
-    filename = f"greeting_{randStr(N=4)}" + ".mp3"
-    text = ai_requests.greet(name, channel, language)
-    
-    logging.info(f"Generating greeting for {name} in {channel} with language {language} \n Text: {text}")
-    
-    generate_voice(text, filename, language)
-    
-    return filename
-    
-    
-def generate_voice(pText, filename, language): 
-    logging.info(f"Generating voice in lang {language}, Text: {pText}")
-    nachricht = gTTS(text=pText, lang=language)
-    filename = filename
-    nachricht.save(filename)
-    logging.info(f"{filename} created")
-
-
 
 
 def delete_file(file):
