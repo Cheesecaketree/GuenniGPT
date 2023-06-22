@@ -2,3 +2,4 @@ gTTS
 discord.py[voice]
 openai
 tiktoken
+google-cloud-texttospeech
