@@ -68,8 +68,6 @@ async def voice_events(pEvent, member, ctx=None):
     
     if pEvent == "welcome":
         file = ai.generate_greeting(name=username, channel=channel_name, pLanguage=channel_lang, activity=activity)
-    elif pEvent == "rating":
-        file = ai.generate_rating(name=username, pLanguage=channel_lang)
         
     else:
         return
@@ -133,17 +131,21 @@ async def queue_abspielen(member):
     
 
 @bot.command()
-async def rateMe(ctx):
-    if ctx.message.author.voice is None:
+async def rating(ctx, name=None):
+    user = ctx.message.author
+    if name is None:
+        name = user.name
+        
+    if user.voice is None:
         logging.debug("User tried to use rateMe command without being in a voice channel")
         await ctx.send("You need to be in a voice channel to use this command")
         return
     
-    await voice_events("rating", ctx.message.author)
-
-
-
-
+    file = ai.generate_rating(name=name, pLanguage="de")
+        
+    channel_queue.enqueue(file, user.voice.channel.name)
+    await queue_abspielen(user)
+    
 
 token = utils.get_json("files/keys.json")["discord"]
 bot.run(token)
