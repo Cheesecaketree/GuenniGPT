@@ -4,6 +4,7 @@ import logging
 import asyncio
 import datetime
 
+import ai_requests as ai
 import channel_queue
 import background_utils as utils
 
@@ -13,8 +14,11 @@ logging.getLogger().addHandler(logging.StreamHandler())
 
 description = utils.get_json("files/config.json")["description"]
 
+intent = discord.Intents.default()
+intent.message_content = True
 
-bot = commands.Bot(command_prefix='?', description=description, intents=discord.Intents.default())
+bot = commands.Bot(command_prefix='?', description=description, intents=intent)
+
 
 @bot.event
 async def on_ready():
@@ -51,8 +55,10 @@ async def on_voice_state_update(member, before, after):
     else: return
     
 
-# starts eventcontrolled functions
-async def voice_events(pEvent, member):
+'''
+Make sure the user is already in a voice channel before calling this function
+'''
+async def voice_events(pEvent, member, ctx=None):
     username = str(member)
     channel = member.voice.channel
     channel_name = channel.name
@@ -63,7 +69,10 @@ async def voice_events(pEvent, member):
     file = None
     
     if pEvent == "welcome":
-        file = utils.generate_greeting(name=username, channel=channel_name, language=channel_lang)
+        file = ai.generate_greeting(name=username, channel=channel_name, language=channel_lang)
+    elif pEvent == "rating":
+        file = ai.generate_rating(name=username, language=channel_lang)
+        
     else:
         return
 
@@ -106,15 +115,17 @@ async def queue_abspielen(member):
         
         logging.info(f"Now playing {file}")
         # with open(file, "rb") as f:
-        voice_connection.play(discord.FFmpegPCMAudio(str(file)))
-        
-        while voice_connection.is_playing():
-            await asyncio.sleep(0.1)
+        if member.voice is not None:
+            voice_connection.play(discord.FFmpegPCMAudio(str(file)))
             
-        await voice_connection.disconnect()
+            while voice_connection.is_playing():
+                await asyncio.sleep(0.1)
+                
+            await voice_connection.disconnect()
         voice_connection.cleanup() 
+        utils.delete_file(str(file))
         channel_queue.queues[queue_index].done()
-        utils.delete_file(file)
+        
 
         if channel_queue.queues[queue_index].isEmpty():
             logging.debug("Queue is empty. Bot has disconnected.")
@@ -123,21 +134,14 @@ async def queue_abspielen(member):
     
     
 
-# def is_muted(member):
-#     events = utils.load_json("Files/events.json")
-#     channel = member.voice.channel
-#     channel_id = str(channel.id)
+@bot.command()
+async def rateMe(ctx):
+    if ctx.message.author.voice is None:
+        logging.info("User tried to use rateMe command without being in a voice channel")
+        await ctx.send("You need to be in a voice channel to use this command")
+        return
     
-#     if channel_id in events["bot-mute"]:
-#         mute_time = events["bot-mute"][channel_id]
-#         if int(time.time()) > mute_time:
-#             del events["bot-mute"][channel_id]
-#             with open ("Files/events.json", "w") as f:
-#                 json.dump(events, f)
-#             return False
-#         else:
-#             return True
-#     return False
+    await voice_events("rating", ctx.message.author)
 
 
 
