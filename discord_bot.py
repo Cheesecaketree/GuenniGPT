@@ -9,8 +9,12 @@ import channel_queue
 import background_utils as utils
 
 
-logging.basicConfig(format='%(asctime)s | %(name)s | %(levelname)s | %(message)s', filename="logfile.log", level=logging.info)
+logging.basicConfig(format='%(asctime)s | %(levelname)s | %(name)s| %(message)s', level=logging.DEBUG)
 logging.getLogger().addHandler(logging.StreamHandler())
+
+# deactivate logging for discord
+logging.getLogger('discord.client').setLevel(logging.ERROR)
+logging.getLogger('discord.gateway').setLevel(logging.WARN)
 
 description = utils.get_json("files/config.json")["description"]
 
@@ -25,7 +29,6 @@ async def on_ready():
     time_str = datetime.datetime.now().strftime("%H:%M")
     logging.info(f"--- Bot ready at {time_str} ---")
     
-        
 
 
 # eventcontrolled functions
@@ -33,15 +36,11 @@ async def on_ready():
 async def on_voice_state_update(member, before, after):
     if member.bot: return
     if member.voice is None: return
-    # if is_muted(member): return # uses member to get voice channel
     
     # user joins voice channel
     if before.channel is not after.channel and after.channel is not None:
-        # await asyncio.sleep(0.5)
-
         await voice_events("welcome", member)
-        #await bot.change_presence(activity=discord.Game(random.choice(status))) # changes discord status of bot
-        
+                
     # # user deafens
     # elif after.self_deaf and not before.self_deaf:
     #     await voice_events("deaf", member)
@@ -60,15 +59,15 @@ async def voice_events(pEvent, member, ctx=None):
     channel = member.voice.channel
     channel_name = channel.name
     channel_lang = "de" # channel.guild.preferred_locale
+    activity = member.activity
 
     logging.info(f"Event {pEvent} triggered for {username}, language: {channel_lang}")
+    logging.info(f"Activity: {activity}")
     
     file = None
     
     if pEvent == "welcome":
-        file = ai.generate_greeting(name=username, channel=channel_name, language=channel_lang)
-    elif pEvent == "rating":
-        file = ai.generate_rating(name=username, language=channel_lang)
+        file = ai.generate_greeting(name=username, channel=channel_name, pLanguage=channel_lang, activity=activity)
         
     else:
         return
@@ -91,7 +90,7 @@ async def create_connection(member):
         return
 
     await member_voice.connect()
-    logging.debug("Bot connected")
+    logging.debug("Bot connected to voice")
 
 
 # Plays files from queue for channel of member
@@ -132,17 +131,21 @@ async def queue_abspielen(member):
     
 
 @bot.command()
-async def rateMe(ctx):
-    if ctx.message.author.voice is None:
-        logging.info("User tried to use rateMe command without being in a voice channel")
+async def rating(ctx, name=None):
+    user = ctx.message.author
+    if name is None:
+        name = user.name
+        
+    if user.voice is None:
+        logging.debug("User tried to use rateMe command without being in a voice channel")
         await ctx.send("You need to be in a voice channel to use this command")
         return
     
-    await voice_events("rating", ctx.message.author)
-
-
-
-
+    file = ai.generate_rating(name=name, pLanguage="de")
+        
+    channel_queue.enqueue(file, user.voice.channel.name)
+    await queue_abspielen(user)
+    
 
 token = utils.get_json("files/keys.json")["discord"]
 bot.run(token)
