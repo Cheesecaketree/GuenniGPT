@@ -8,7 +8,6 @@ import ai_requests as ai
 import channel_queue
 import background_utils as utils
 
-
 logging.basicConfig(format='%(asctime)s | %(levelname)s | %(name)s| %(message)s', level=logging.DEBUG)
 logging.getLogger().addHandler(logging.StreamHandler())
 
@@ -62,11 +61,27 @@ async def rating(ctx, name=None):
         name = user.name
         
     if user.voice is None:
-        logging.debug("User tried to use rateMe command without being in a voice channel")
+        logging.debug("User tried to use rating command without being in a voice channel")
         await ctx.send("You need to be in a voice channel to use this command")
         return
     
     file = ai.generate_rating(name=name, pLanguage=lang)
+        
+    await play_audio(file, user)   
+
+
+@bot.command()
+async def compliment(ctx, name=None):
+    user = ctx.message.author
+    if name is None:
+        name = user.name
+        
+    if user.voice is None:
+        logging.debug("User tried to use compliment command without being in a voice channel")
+        await ctx.send("You need to be in a voice channel to use this command")
+        return
+    
+    file = ai.generate_compliment(name=name, pLanguage=lang)
         
     await play_audio(file, user)   
 
@@ -86,7 +101,8 @@ async def talkAbout(ctx, topic):
     
     await play_audio(file, user)
     
-    
+
+
 # connects bot to voice channel of member
 async def create_connection(member):
     member_voice = member.voice.channel

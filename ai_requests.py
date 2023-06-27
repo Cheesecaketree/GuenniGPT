@@ -14,6 +14,31 @@ openai.api_key = out["openai"]
 openai.organization = out["openai-org"]
 
 
+def generate_compliment(name, pLanguage):
+    if pLanguage == "de":
+        language = "german"
+    
+    name = name.split("#")[0]
+    filename = f"rating_{randStr(N=4)}" + ".mp3"
+    
+    # orig sys message = "You are a discord bot that can talk. You will get names of people and then rate them randomly. Do whatever you want, be creative, be rude. If you want to write \"x/y\" for rating, write it out like \"x out of y\" instead. Keep it short and always use the given language. "
+    system_message = 'You are a discord bot that can talk. You will get the name of a user. Compliment them in a funny and random way. Be creative, be rude. Keep it short. Use the given language'
+    user_message = f"Give {name} a compliment.lang={language}"
+    
+    messages = [
+        {"role": "system", "content": system_message},
+        {"role": "user", "content": user_message},
+    ]
+    
+    text = get_chatcompletion(messages, temperature=0.95, max_tokens=256)
+    
+    logging.debug(f"Generating compliment for {name} with language {pLanguage} \nText: {text}")
+    
+    voice.generate(text, filename, pLanguage)
+    
+    return filename
+
+
 def generate_rating(name, pLanguage):
     if pLanguage == "de":
         language = "german"
