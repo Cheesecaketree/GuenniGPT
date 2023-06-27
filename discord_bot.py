@@ -16,6 +16,7 @@ logging.getLogger().addHandler(logging.StreamHandler())
 logging.getLogger('discord.client').setLevel(logging.ERROR)
 logging.getLogger('discord.gateway').setLevel(logging.WARN)
 
+lang = utils.get_json("files/config.json")["language"]
 description = utils.get_json("files/config.json")["description"]
 
 intent = discord.Intents.default()
@@ -37,51 +38,56 @@ async def on_voice_state_update(member, before, after):
     if member.bot: return
     if member.voice is None: return
     
-    # user joins voice channel
-    if before.channel is not after.channel and after.channel is not None:
-        await voice_events("welcome", member)
-                
-    # # user deafens
-    # elif after.self_deaf and not before.self_deaf:
-    #     await voice_events("deaf", member)
-        
-    # # user starts stream
-    # elif after.self_stream and not before.self_stream:
-    #     await voice_events("stream", member)
-    else: return
+    file = None
     
-
-'''
-Make sure the user is already in a voice channel before calling this function
-'''
-async def voice_events(pEvent, member, ctx=None):
     username = str(member)
     channel = member.voice.channel
     channel_name = channel.name
-    channel_lang = "de" # channel.guild.preferred_locale
+    channel_lang = lang
     activity = member.activity
-
-    logging.info(f"Event {pEvent} triggered for {username}, language: {channel_lang}")
-    logging.info(f"Activity: {activity}")
     
-    file = None
-    
-    if pEvent == "welcome":
+    # user joins voice channel
+    if before.channel is not after.channel and after.channel is not None:
         file = ai.generate_greeting(name=username, channel=channel_name, pLanguage=channel_lang, activity=activity)
-        
-    else:
+        await play_audio(file, member)
         return
+                
+    else: return
+    
 
-    if file is not None:
-        channel_queue.enqueue(file, channel_name)
-        await queue_abspielen(member)
-    else: 
-        logging.error(f"File for {pEvent} could not be created")
+@bot.command()
+async def rating(ctx, name=None):
+    user = ctx.message.author
+    if name is None:
+        name = user.name
+        
+    if user.voice is None:
+        logging.debug("User tried to use rateMe command without being in a voice channel")
+        await ctx.send("You need to be in a voice channel to use this command")
+        return
+    
+    file = ai.generate_rating(name=name, pLanguage=lang)
+        
+    await play_audio(file, user)   
+
+
+@bot.command()
+async def talkAbout(ctx, topic):
+    user = ctx.message.author
+    if user.voice is None:
+        await ctx.send("You need to be in a voice channel to use this command")
+        return
+    
+    if topic is None:
+        await ctx.send("Please specify a topic")
+        return
+    
+    file = ai.generate_talk_about(topic=topic, pLanguage=lang)
+    
+    await play_audio(file, user)
     
     
-    
-    
-# Verbindet mit einem Channel, wenn es möglich ist
+# connects bot to voice channel of member
 async def create_connection(member):
     member_voice = member.voice.channel
     server = member.guild
@@ -92,9 +98,10 @@ async def create_connection(member):
     await member_voice.connect()
     logging.debug("Bot connected to voice")
 
-
-# Plays files from queue for channel of member
-async def queue_abspielen(member):
+    
+# enqueues the file and plays it 
+async def play_audio(file, member):
+    channel_queue.enqueue(file, channel_name=member.voice.channel.name)
     await create_connection(member)
 
     server = member.guild
@@ -127,25 +134,8 @@ async def queue_abspielen(member):
             logging.debug("Queue is empty. Bot has disconnected.")
             return
         logging.debug("Queue not empty. Bot is playing next file")
-    
-    
+        
 
-@bot.command()
-async def rating(ctx, name=None):
-    user = ctx.message.author
-    if name is None:
-        name = user.name
-        
-    if user.voice is None:
-        logging.debug("User tried to use rateMe command without being in a voice channel")
-        await ctx.send("You need to be in a voice channel to use this command")
-        return
-    
-    file = ai.generate_rating(name=name, pLanguage="de")
-        
-    channel_queue.enqueue(file, user.voice.channel.name)
-    await queue_abspielen(user)
-    
 
 token = utils.get_json("files/keys.json")["discord"]
 bot.run(token)

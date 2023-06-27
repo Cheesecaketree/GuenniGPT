@@ -39,6 +39,30 @@ def generate_rating(name, pLanguage):
     return filename
 
 
+def generate_talkAbout(topic, pLanguage):
+    if pLanguage == "de":
+        language = "german"
+    
+    filename = f"talkAbout_{randStr(N=4)}" + ".mp3"
+    
+    # orig sys message = "You are a discord bot that can talk. You will get a topic and then talk about it. Do whatever you want, be creative, be rude. Keep it short and always use the given language. "
+    system_message = 'You are a discord bot that can talk. You will get a topic and then talk about it. Be creative. Keep it short.'
+    user_message = f"Talk about {topic}.lang={language}"
+    
+    messages = [
+        {"role": "system", "content": system_message},
+        {"role": "user", "content": user_message},
+    ]
+    
+    text = get_chatcompletion(messages, temperature=0.95, max_tokens=256)
+    
+    logging.debug(f"Generating talkAbout for {topic} with language {pLanguage} \nText: {text}")
+    
+    voice.generate(text, filename, pLanguage)
+    
+    return filename
+    
+    
 
 def generate_greeting(name, channel, pLanguage, activity):
     language = "german" if pLanguage == "de" else "english"
@@ -82,3 +106,10 @@ def get_chatcompletion(messages, temperature=1, max_tokens=256):
     return response_message
 
 
+def moderation_check(message):
+    response = openai.Moderation.create(
+        input=message,
+    )
+    output = response["results"][0]
+    
+    return output
