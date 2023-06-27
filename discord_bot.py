@@ -86,20 +86,20 @@ async def compliment(ctx, name=None):
     await play_audio(file, user)   
 
 
-@bot.command()
-async def talkAbout(ctx, topic):
-    user = ctx.message.author
-    if user.voice is None:
-        await ctx.send("You need to be in a voice channel to use this command")
-        return
+# @bot.command()
+# async def talkAbout(ctx, topic=None):
+#     user = ctx.message.author
+#     if user.voice is None:
+#         await ctx.send("You need to be in a voice channel to use this command")
+#         return
     
-    if topic is None:
-        await ctx.send("Please specify a topic")
-        return
+#     if topic is None:
+#         await ctx.send("Please specify a topic")
+#         return
     
-    file = ai.generate_talk_about(topic=topic, pLanguage=lang)
+#     file = ai.generate_talk_about(topic=topic, pLanguage=lang)
     
-    await play_audio(file, user)
+#     await play_audio(file, user)
     
 
 
