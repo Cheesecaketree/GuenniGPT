@@ -97,8 +97,9 @@ def generate_greeting(name, channel, pLanguage, activity):
     
     # orig system message: You are a discord bot that greets people joining a voice chat. You get passed the name of the person, the time and the server language. Greet them in a funny and creative way. Keep it short, be rude, always use the given language"
    # original user prompt: f"lang={language}, {name} joined channel \"{channel}\" at {time_str}"
+    # f"You are a discord bot that greets people joining a voice channel. You get some information about the user and the channel. Greet them in a funny and creative way. Keep it short, be rude. Dont use emojis. Use this language:{pLanguage}"
     
-    system_message = f"You are a discord bot that greets people joining a voice channel. You get some information about the user and the channel. Greet them in a funny and creative way. Keep it short, be rude. Dont use emojis. Use this language:{pLanguage}"
+    system_message = f'You are a discord bot that greets people joining a discord channel. Greet them in a funny and creative way. Keep it to two sentences. Be rude. Use the language:{language}'
     user_message = f'{name} joined channel {channel} at {time_str}.lang={language}'
 
     messages = [
