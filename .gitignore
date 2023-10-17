@@ -3,4 +3,4 @@
 *pycache*
 *.log
 gcloud*
-
+.DS_Store
