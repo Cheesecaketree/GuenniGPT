@@ -9,12 +9,13 @@ import channel_queue
 import background_utils as utils
 import user_activity
 
-logging.basicConfig(format='%(asctime)s | %(levelname)s | %(name)s| %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s | %(levelname)s | %(name)s| %(message)s', level=logging.ERROR)
 logging.getLogger().addHandler(logging.StreamHandler())
 
 # deactivate logging for discord
 logging.getLogger('discord.client').setLevel(logging.ERROR)
 logging.getLogger('discord.gateway').setLevel(logging.WARN)
+logging.getLogger('discord.voice_client').setLevel(logging.ERROR)
 
 lang = utils.get_json("files/config.json")["language"]
 description = utils.get_json("files/config.json")["description"]
@@ -36,30 +37,34 @@ async def on_ready():
 @bot.event
 async def on_voice_state_update(member, before, after):
     if member.bot: return
-    if member.voice is None: return
+    #if member.voice is None: return
     
     file = None
     
     username = str(member)
-    channel = member.voice.channel
-    channel_name = channel.name
-    channel_lang = lang
     activity = member.activity
+    
+    # user leaves voice channel
+    if before.channel is not None and after.channel is not before.channel: 
+        logging.debug(f"{username} left {before.channel.name}")
+        # set user_last_leave to current time
+        user_activity.set_user_recently_left(before.channel.name, username)
+        return
     
     # user joins voice channel
     if before.channel is not after.channel and after.channel is not None:
+        channel = member.voice.channel
+        channel_name = channel.name
+        channel_lang = lang
+        
         # check if user was already in channel in the last 10 minutes
-        if user_activity.user_recently_joined(channel_name, username):
+        if user_activity.get_user_recently_left(channel_name, username):
             logging.info(f"{username} recently joined {channel_name}")
-            return
         else:
-            
             # generates audio and plays it
             file = ai.generate_greeting(name=username, channel=channel_name, pLanguage=channel_lang, activity=activity)
             await play_audio(file, member)
-            return
-                
-    else: return
+        return
     
 
 @bot.command()
