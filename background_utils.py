@@ -20,7 +20,11 @@ def get_json(path):
 
 
 def delete_file(file):
-    os.remove(file)
+    try:
+        os.remove(file)
+    except Exception as e:
+        raise ValueError(f"Failed to delete file: {e}")
+    
     
 def randStr(chars = string.ascii_uppercase + string.digits, N=10):
 	return ''.join(random.choice(chars) for _ in range(N))
