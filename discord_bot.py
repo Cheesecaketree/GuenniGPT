@@ -7,6 +7,7 @@ import datetime
 import ai_requests as ai
 import channel_queue
 import background_utils as utils
+import user_activity
 
 logging.basicConfig(format='%(asctime)s | %(levelname)s | %(name)s| %(message)s', level=logging.DEBUG)
 logging.getLogger().addHandler(logging.StreamHandler())
@@ -47,9 +48,16 @@ async def on_voice_state_update(member, before, after):
     
     # user joins voice channel
     if before.channel is not after.channel and after.channel is not None:
-        file = ai.generate_greeting(name=username, channel=channel_name, pLanguage=channel_lang, activity=activity)
-        await play_audio(file, member)
-        return
+        # check if user was already in channel in the last 10 minutes
+        if user_activity.user_recently_joined(channel_name, username):
+            logging.info(f"{username} recently joined {channel_name}")
+            return
+        else:
+            
+            # generates audio and plays it
+            file = ai.generate_greeting(name=username, channel=channel_name, pLanguage=channel_lang, activity=activity)
+            await play_audio(file, member)
+            return
                 
     else: return
     
