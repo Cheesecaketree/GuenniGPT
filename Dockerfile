@@ -10,7 +10,7 @@ ADD ./files/config.json /usr/src/bot/
 # ADD ./cogs /usr/src/bot/
 
 RUN apt update
-RUN apt upgrade -y
+#RUN apt upgrade -y
 RUN apt install libffi-dev libnacl-dev python3-dev -y
 
 # install python libraries
