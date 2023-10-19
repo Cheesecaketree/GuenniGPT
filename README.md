@@ -2,7 +2,7 @@
 
 ## What is GuenniGPT?
 
-GuenniGPT is a simple discord bot and a fun little side project of mine. It is written in Python and uses the discord.py library.
+GuenniGPT is a simple discord bot and a fun little side project. It is written in Python and uses the discord.py library.
 
 ## What can GuenniGPT do?
 
@@ -14,10 +14,9 @@ To use GuenniGPT, you need to have a Google Cloud account and a project with the
 You also have to [create a Discord bot](https://discordpy.readthedocs.io/en/stable/discord.html) and invite it to your server.
 The last key you will need is the [OpenAI API key](https://beta.openai.com/docs/developer-quickstart/your-api-keys).
 
-Put all of these keys into a file `./files/keys.json` and you should be good to go.
+Put the Google TTS key and a `keys.json` file with the other keys in `./files` and you should be good to go.
 
 ## How to run GuenniGPT?
 
 Just run the docker compose file.
-There is also an docker image available but you have to figure out how to get the keys into the container yourself.
-Maybe if I start understanding what I am doing I will make it easier to use in the future.
+There is also a docker image available but you have to figure out how it works. I somehow got it to work but I dont really understand what I did. If I manage to understand this stuff, I will add an instruction here
