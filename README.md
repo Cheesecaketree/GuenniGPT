@@ -18,5 +18,8 @@ Put the Google TTS key and a `keys.json` file with the other keys in `./files` a
 
 ## How to run GuenniGPT?
 
-Just run the docker compose file.
-There is also a docker image available but you have to figure out how it works. I somehow got it to work but I dont really understand what I did. If I manage to understand this stuff, I will add an instruction here
+You can just clone the repository and run `docker-compose up -d` to run the bot.
+
+If you like the easy way, you can get the image from [GitHub Packages](https://ghcr.io/cheesecaketree/guennigpt:latest) and run it with `docker run -d -v ./config:/usr/src/bot/config ghcr.io/cheesecaketree/guennigpt:latest`.
+
+To run the image you need to mount the `./config` directory to `/usr/src/bot/config`. Then it should work.
