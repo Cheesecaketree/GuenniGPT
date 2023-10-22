@@ -1,6 +1,6 @@
-*/keys.json
 .venv/
 *pycache*
+.DS_Store
+*key*
 *.log
 gcloud*
-.DS_Store
