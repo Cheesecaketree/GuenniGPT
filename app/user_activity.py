@@ -11,9 +11,10 @@ import json
 
 def get_user_recently_left(channel, member):
     # get timeout from config.json
-    with open('files/config.json') as f:
+    with open('config/config.json') as f:
         config = json.load(f)
     timeout = config['timeout']
+    
     
     if channel not in user_last_leave or member not in user_last_leave[channel] or user_last_leave[channel][member] + timeout < time.time():
         return False

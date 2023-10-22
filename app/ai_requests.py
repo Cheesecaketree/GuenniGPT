@@ -7,7 +7,7 @@ import logging
 import voice_gen as voice
 
 
-with open("files/keys.json", "r") as f:
+with open("config/keys.json", "r") as f:
     out = json.load(f)
     
 openai.api_key = out["openai"]
