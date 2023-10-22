@@ -3,7 +3,7 @@ import os
 import logging
 from gtts import gTTS
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "./files/gcloud_key.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "config/gcloud_key.json"
 
 def synthesize_ssml(input, voice, audio_config):
     client = tts.TextToSpeechClient()

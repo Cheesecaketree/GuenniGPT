@@ -17,8 +17,8 @@ logging.getLogger('discord.client').setLevel(logging.ERROR)
 logging.getLogger('discord.gateway').setLevel(logging.WARN)
 logging.getLogger('discord.voice_client').setLevel(logging.ERROR)
 
-lang = utils.get_json("files/config.json")["language"]
-description = utils.get_json("files/config.json")["description"]
+lang = utils.get_json("config/config.json")["language"]
+description = utils.get_json("config/config.json")["description"]
 
 intent = discord.Intents.default()
 intent.message_content = True
@@ -166,5 +166,5 @@ async def play_audio(file, member):
         
 
 
-token = utils.get_json("files/keys.json")["discord"]
+token = utils.get_json("config/keys.json")["discord"]
 bot.run(token)
