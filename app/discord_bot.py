@@ -9,18 +9,19 @@ import channel_queue
 import background_utils as utils
 import user_activity
 
-logging.basicConfig(format='%(asctime)s | %(levelname)s | %(name)s| %(message)s', level=logging.ERROR)
+logging.basicConfig(format='%(asctime)s | %(levelname)s | %(name)s| %(message)s', level=logging.WARN)
 logging.getLogger().addHandler(logging.StreamHandler())
 
 # deactivate logging for discord
-logging.getLogger('discord.client').setLevel(logging.ERROR)
+logging.getLogger('discord.client').setLevel(logging.WARN)
 logging.getLogger('discord.gateway').setLevel(logging.WARN)
-logging.getLogger('discord.voice_client').setLevel(logging.ERROR)
+logging.getLogger('discord.voice_client').setLevel(logging.WARN)
 
 lang = utils.get_json("config/config.json")["language"]
 description = utils.get_json("config/config.json")["description"]
 
 intent = discord.Intents.default()
+intent = discord.Intents(guilds=True, members=True, presences=True, voice_states=True)
 intent.message_content = True
 
 bot = commands.Bot(command_prefix='?', description=description, intents=intent)
@@ -42,7 +43,6 @@ async def on_voice_state_update(member, before, after):
     file = None
     
     username = str(member)
-    activity = member.activity
     
     # user leaves voice channel
     if before.channel is not None and after.channel is not before.channel: 
@@ -62,8 +62,12 @@ async def on_voice_state_update(member, before, after):
             logging.info(f"{username} recently joined {channel_name}")
         else:
             # generates audio and plays it
-            file = ai.generate_greeting(name=username, channel=channel_name, pLanguage=channel_lang, activity=activity)
-            await play_audio(file, member)
+            file = ai.generate_greeting(user=member, channel=channel, pLanguage=channel_lang)
+            try:
+                await play_audio(file, member)
+            except Exception as e:
+                logging.error(f"Error playing audio file: {e}")
+                utils.delete_file(str(file))
         return
     
 
