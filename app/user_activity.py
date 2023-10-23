@@ -1,8 +1,6 @@
 import logging
 import time
 
-logging.basicConfig(format='%(asctime)s | %(name)s | %(levelname)s | %(message)s',filename='logfile.log', level=logging.INFO)
-
 
 user_last_leave = {}
 
@@ -14,7 +12,6 @@ def get_user_recently_left(channel, member):
     with open('config/config.json') as f:
         config = json.load(f)
     timeout = config['timeout']
-    
     
     if channel not in user_last_leave or member not in user_last_leave[channel] or user_last_leave[channel][member] + timeout < time.time():
         return False
