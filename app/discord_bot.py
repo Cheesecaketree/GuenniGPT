@@ -1,22 +1,15 @@
 import discord
 from discord.ext import commands
-import logging
+import central_logger as logger
 import asyncio
 import datetime
 
-from config import config
+from config import config, keys
 import ai_requests as ai
 import channel_queue
 import background_utils as utils
 import user_activity
 
-logging.basicConfig(format='%(asctime)s | %(levelname)s | %(name)s| %(message)s', level=logging.WARN)
-logging.getLogger().addHandler(logging.StreamHandler())
-
-# deactivate logging for discord
-logging.getLogger('discord.client').setLevel(logging.WARN)
-logging.getLogger('discord.gateway').setLevel(logging.WARN)
-logging.getLogger('discord.voice_client').setLevel(logging.WARN)
 
 lang = config["language"] # utils.get_json("config/config.json")["language"]
 description = config["description"] # utils.get_json("config/config.json")["description"]
@@ -31,8 +24,9 @@ bot = commands.Bot(command_prefix='?', description=description, intents=intent)
 
 @bot.event
 async def on_ready():
+    bot.disable_logging()
     time_str = datetime.datetime.now().strftime("%H:%M")
-    logging.info(f"--- Bot ready at {time_str} ---")
+    logger.info(f"--- Bot ready at {time_str} ---")
     
 
 
@@ -48,7 +42,7 @@ async def on_voice_state_update(member, before, after):
     
     # user leaves voice channel
     if before.channel is not None and after.channel is not before.channel: 
-        logging.debug(f"{username} left {before.channel.name}")
+        logger.debug(f"{username} left {before.channel.name}")
         # set user_last_leave to current time
         user_activity.set_user_recently_left(before.channel.name, username)
         return
@@ -61,14 +55,14 @@ async def on_voice_state_update(member, before, after):
         
         # check if user was already in channel in the last 10 minutes
         if user_activity.get_user_recently_left(channel_name, username):
-            logging.info(f"{username} recently joined {channel_name}")
+            logger.info(f"{username} recently joined {channel_name}")
         else:
             # generates audio and plays it
             file = ai.generate_greeting(user=member, channel=channel, pLanguage=channel_lang)
             try:
                 await play_audio(file, member)
             except Exception as e:
-                logging.error(f"Error playing audio file: {e}")
+                logger.error(f"Error playing audio file: {e}")
                 utils.delete_file(str(file))
         return
     
@@ -80,7 +74,7 @@ async def rating(ctx, name=None):
         name = user.name
         
     if user.voice is None:
-        logging.debug("User tried to use rating command without being in a voice channel")
+        logger.debug("User tried to use rating command without being in a voice channel")
         await ctx.send("You need to be in a voice channel to use this command")
         return
     
@@ -96,7 +90,7 @@ async def compliment(ctx, name=None):
         name = user.name
         
     if user.voice is None:
-        logging.debug("User tried to use compliment command without being in a voice channel")
+        logger.debug("User tried to use compliment command without being in a voice channel")
         await ctx.send("You need to be in a voice channel to use this command")
         return
     
@@ -131,7 +125,7 @@ async def create_connection(member):
         return
 
     await member_voice.connect()
-    logging.debug("Bot connected to voice")
+    logger.debug("Bot connected to voice")
 
     
 # enqueues the file and plays it 
@@ -149,9 +143,9 @@ async def play_audio(file, member):
         await create_connection(member)
         
         file = channel_queue.dequeue(queue_index)
-        logging.info(f"{file} was removed from queue")
+        logger.info(f"{file} was removed from queue")
         
-        logging.info(f"Now playing {file}")
+        logger.info(f"Now playing {file}")
         # with open(file, "rb") as f:
         if member.voice is not None:
             voice_connection.play(discord.FFmpegPCMAudio(str(file)))
@@ -166,11 +160,11 @@ async def play_audio(file, member):
         
 
         if channel_queue.queues[queue_index].isEmpty():
-            logging.debug("Queue is empty. Bot has disconnected.")
+            logger.debug("Queue is empty. Bot has disconnected.")
             return
-        logging.debug("Queue not empty. Bot is playing next file")
+        logger.debug("Queue not empty. Bot is playing next file")
         
 
 
-token = utils.get_json("config/keys.json")["discord"]
+token = keys["discord"]
 bot.run(token)

@@ -3,23 +3,19 @@ from background_utils import randStr
 import remove_emoji
 import json
 import datetime
-import logging
+import central_logger as logger
 import voice_gen as voice
 import random
-from config import config
+from config import config, keys
 
-logging.basicConfig(format='%(asctime)s | %(levelname)s | %(name)s| %(message)s', level=logging.WARN)
 
-with open("config/keys.json", "r") as f:
-    keys = json.load(f)
     
 openai.api_key = keys["openai"]
 openai.organization = keys["openai-org"]
 
 
 def generate_compliment(name, pLanguage):
-    if pLanguage == "de":
-        language = "german"
+    language = "german" # TODO: implement different languages properly
     
     name = name.split("#")[0]
     filename = f"rating_{randStr(N=4)}" + ".mp3"
@@ -34,15 +30,15 @@ def generate_compliment(name, pLanguage):
     
     text = get_chatcompletion(messages, temperature=0.95, max_tokens=256)
     
-    logging.debug(f"Generating compliment for {name} with language {pLanguage} \nText: {text}")
+    logger.debug(f"Generating compliment for {name} with language {pLanguage} \nText: {text}")
     
     voice.generate(text, filename, pLanguage)
     
     return filename
 
 def generate_rating(name, pLanguage):
-    if pLanguage == "de":
-        language = "german"
+
+    language = "german" # TODO: implement different languages properly
     
     name = name.split("#")[0]
     filename = f"rating_{randStr(N=4)}" + ".mp3"
@@ -57,7 +53,7 @@ def generate_rating(name, pLanguage):
     
     text = get_chatcompletion(messages, temperature=0.95, max_tokens=256)
     
-    logging.debug(f"Generating rating for {name} with language {pLanguage} \nText: {text}")
+    logger.debug(f"Generating rating for {name} with language {pLanguage} \nText: {text}")
     
     voice.generate(text, filename, pLanguage)
     
@@ -65,8 +61,7 @@ def generate_rating(name, pLanguage):
 
 # TODO: implement feature or delete this function
 def generate_talkAbout(topic, pLanguage):
-    if pLanguage == "de":
-        language = "german"
+    language = "german" # TODO: implement different languages properly
     
     filename = f"talkAbout_{randStr(N=4)}" + ".mp3"
     
@@ -80,7 +75,7 @@ def generate_talkAbout(topic, pLanguage):
     
     text = get_chatcompletion(messages, temperature=0.95, max_tokens=256)
     
-    logging.debug(f"Generating talkAbout for {topic} with language {pLanguage} \nText: {text}")
+    logger.debug(f"Generating talkAbout for {topic} with language {pLanguage} \nText: {text}")
     
     voice.generate(text, filename, pLanguage)
     
@@ -125,11 +120,11 @@ def generate_greeting(user, channel, pLanguage):
     
     try:
         text = get_chatcompletion(messages, temperature=1, max_tokens=256)
-        logging.debug(f"generated greeting text: {text}")
+        logger.debug(f"generated greeting text: {text}")
     except Exception as e:
         # if something goes wrong, just use a default message, kinda boring but better than nothing
         # not even sure if this can happen, but better safe than sorry
-        logging.error(f"Error generating chat completion: {e}")
+        logger.error(f"Error generating chat completion: {e}")
         text = f"Hey {username}!"
     
     voice.generate(text, filename, pLanguage)
@@ -147,7 +142,7 @@ def get_random_event_today():
 
 
 def get_chatcompletion(messages, temperature=1, max_tokens=256):
-    logging.debug(f"requesting chatcompletion for message: {messages}")
+    logger.debug(f"requesting chatcompletion for message: {messages}")
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=messages,

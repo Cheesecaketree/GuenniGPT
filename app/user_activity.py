@@ -1,4 +1,4 @@
-import logging
+import central_logger as logger
 import time
 from config import config
 
@@ -17,7 +17,7 @@ def get_user_recently_left(channel, member):
     return True
 
 def set_user_recently_left(channel, member):
-    logging.info(f"set_user_recently_left: {channel} {member} {time.time()}")
+    logger.info(f"set_user_recently_left: {channel} {member} {time.time()}")
     if channel not in user_last_leave:
         user_last_leave[channel] = {}
     user_last_leave[channel][member] = time.time()
