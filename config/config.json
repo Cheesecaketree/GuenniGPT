@@ -2,36 +2,15 @@
     "description": "A discord bot that greets people when they join the server.",
     "language": "de",
     "timeout": 600,
-    "greeting_styles": [
-        {
-            "weight": 35,
-            "style": "sarcastic"
-        },
-        {
-            "weight": 45,
-            "style": "sarcastic and rude"
-        },
-        {
-            "weight": 20,
-            "style": "humorous"
-        },
-        {
-            "weight": 5,
-            "style": "friendly"
-        },
-        {
-            "weight": 3,
-            "style": "old fashioned and formal"
-        },
-        {
-            "weight": 4,
-            "style": "dramatic"
-        },
-        {
-            "weight": 3,
-            "style": "very serious and formal"
-        }
-    ],
+    "greeting_styles": {
+        "sarcastic": 35,
+        "sarcastic and rude": 45,
+        "humorous": 20,
+        "friendly": 5,
+        "old fashioned and formal": 3,
+        "dramatic": 4,
+        "very serious and formal": 3
+    },
     "events": {
         "31.10": [
             "Today is Halloween! Be scray!",
