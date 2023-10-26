@@ -4,6 +4,7 @@ import logging
 import asyncio
 import datetime
 
+from config import config
 import ai_requests as ai
 import channel_queue
 import background_utils as utils
@@ -17,14 +18,15 @@ logging.getLogger('discord.client').setLevel(logging.WARN)
 logging.getLogger('discord.gateway').setLevel(logging.WARN)
 logging.getLogger('discord.voice_client').setLevel(logging.WARN)
 
-lang = utils.get_json("config/config.json")["language"]
-description = utils.get_json("config/config.json")["description"]
+lang = config["language"] # utils.get_json("config/config.json")["language"]
+description = config["description"] # utils.get_json("config/config.json")["description"]
 
 intent = discord.Intents.default()
 intent = discord.Intents(guilds=True, members=True, presences=True, voice_states=True)
 intent.message_content = True
 
 bot = commands.Bot(command_prefix='?', description=description, intents=intent)
+
 
 
 @bot.event

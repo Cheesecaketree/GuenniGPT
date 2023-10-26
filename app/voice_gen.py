@@ -18,9 +18,10 @@ def synthesize_ssml(input, voice, audio_config):
     
     return response, input_text
 
+# TODO: implement language change
 de_voice = tts.VoiceSelectionParams(
     language_code="de-DE", # "de-DE",
-    name= "de-DE-Standard-F",   # "de-DE-Standard-F", #"de-DE-Wavenet-F",
+    name= "de-DE-Standard-F",   # "de-DE-Standard-F", #"de-DE-Wavenet-F", 
     ssml_gender=tts.SsmlVoiceGender.FEMALE,
 )
 
