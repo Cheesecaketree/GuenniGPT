@@ -1,6 +1,6 @@
 import google.cloud.texttospeech as tts
 import os
-import central_logger as logger
+from central_logger import logger
 from gtts import gTTS
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "config/gcloud_key.json"

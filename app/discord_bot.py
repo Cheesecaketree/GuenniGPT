@@ -1,6 +1,7 @@
 import discord
+
 from discord.ext import commands
-import central_logger as logger
+from central_logger import logger
 import asyncio
 import datetime
 
@@ -14,20 +15,19 @@ import user_activity
 lang = config["language"] # utils.get_json("config/config.json")["language"]
 description = config["description"] # utils.get_json("config/config.json")["description"]
 
-intent = discord.Intents.default()
-intent = discord.Intents(guilds=True, members=True, presences=True, voice_states=True)
-intent.message_content = True
+intents = discord.Intents.default()
+intents = discord.Intents(guilds=True, members=True, presences=True, voice_states=True)
+intents.message_content = True
 
-bot = commands.Bot(command_prefix='?', description=description, intents=intent)
-
-
+bot = commands.Bot(command_prefix='?', description=description, intents=intents)
 
 @bot.event
 async def on_ready():
-    bot.disable_logging()
     time_str = datetime.datetime.now().strftime("%H:%M")
     logger.info(f"--- Bot ready at {time_str} ---")
     
+    
+
 
 
 # eventcontrolled functions
@@ -66,6 +66,11 @@ async def on_voice_state_update(member, before, after):
                 utils.delete_file(str(file))
         return
     
+
+
+@bot.command(name = "ping", description = "ping command") # TODO: remove guild  , guild=discord.Object(id=603978404198612993)
+async def ping(ctx):
+    await ctx.send("pong")
 
 @bot.command()
 async def rating(ctx, name=None):

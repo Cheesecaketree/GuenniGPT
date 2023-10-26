@@ -1,4 +1,4 @@
-import central_logger as logger
+from central_logger import logger
 from audio_queue import AudioQueue
 
 

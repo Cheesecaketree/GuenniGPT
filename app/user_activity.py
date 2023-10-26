@@ -1,4 +1,4 @@
-import central_logger as logger
+from central_logger import logger
 import time
 from config import config
 

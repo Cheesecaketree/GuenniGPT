@@ -3,7 +3,7 @@ from background_utils import randStr
 import remove_emoji
 import json
 import datetime
-import central_logger as logger
+from central_logger import logger
 import voice_gen as voice
 import random
 from config import config, keys

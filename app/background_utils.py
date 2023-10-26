@@ -1,7 +1,7 @@
 import json
 import random
 import string
-import central_logger as logger
+from central_logger import logger
 import os
 import tiktoken
 
