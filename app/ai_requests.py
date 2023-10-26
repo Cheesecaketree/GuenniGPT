@@ -6,14 +6,15 @@ import datetime
 import logging
 import voice_gen as voice
 import random
+from config import config
 
 logging.basicConfig(format='%(asctime)s | %(levelname)s | %(name)s| %(message)s', level=logging.WARN)
 
 with open("config/keys.json", "r") as f:
-    out = json.load(f)
+    keys = json.load(f)
     
-openai.api_key = out["openai"]
-openai.organization = out["openai-org"]
+openai.api_key = keys["openai"]
+openai.organization = keys["openai-org"]
 
 
 def generate_compliment(name, pLanguage):
@@ -69,7 +70,6 @@ def generate_talkAbout(topic, pLanguage):
     
     filename = f"talkAbout_{randStr(N=4)}" + ".mp3"
     
-    # orig sys message = "You are a discord bot that can talk. You will get a topic and then talk about it. Do whatever you want, be creative, be rude. Keep it short and always use the given language. "
     system_message = f"You are a discord bot that can talk. You will get a topic and then talk about it. Be creative. Keep it short."
     user_message = f"Talk about {topic}.lang={language}"
     
@@ -89,41 +89,34 @@ def generate_talkAbout(topic, pLanguage):
     
 # TODO: implement new prompt and more data for the prompts to work with
 def generate_greeting(user, channel, pLanguage):
-    channel.name
     filename = f"greeting_{randStr(N=4)}" + ".mp3"
-    name = str(user).split("#")[0] # shouldn"t be necessary anymore since discord changed usernames, but doenst break anything like this
-    language = "german" if pLanguage == "de" else "english" # TODO: implement differnt languages properly
+    language = "german" if pLanguage == "de" else "english" # TODO: implement different languages properly
     
+    username = str(user).split("#")[0] # shouldn"t be necessary anymore since discord changed usernames, needs testing
     time_str = datetime.datetime.now().strftime("%H:%M")
-    activity = user.activity # TODO: Find out what permissions are needed for this (audit log maybe??)
-    other_people = len(channel.members) - 1 # TODO: needs testing! 
+    activity = user.activity # TODO: Find out what permissions are needed for this (audit log maybe?)
+    num_other_people = len(channel.members) - 1
     
+    event = get_random_event_today()
+    style = get_random_greeting_style()
     
-   
-    extra_info = [
-        {"weight": 2, "text": f"There are currently {other_people} other people in the channel."}, # other people
-        {"weight": 1, "text": f"The channel is called {channel.name}."}, # channel name
-        {"weight": 1, "text": f"The channel is called {channel.name} and there are {other_people} other people present."}, # channel name
-        {"weight": 2, "text": f"Today is {datetime.datetime.now().strftime('%A')}."}, # Day of week
-        {"weight": 100, "text": f"Their current activity is {activity}"}, 
+    # weighted additions to the prompt
+    additions = [
+        {"weight": 2, "text": f"There are currently {num_other_people} other people in the channel."},
+        {"weight": 1, "text": f"The channel is called {channel.name}."},
+        {"weight": 1, "text": f"The channel is called {channel.name} and there are {num_other_people} other people present."},
+        {"weight": 2, "text": f"Today is {datetime.datetime.now().strftime('%A')}."},
     ]
-        
+
+    additions.append({"weight": 3, "text": f"They are currently alone in the channel"}) if num_other_people == 0 else None
+    additions.append({"weight": 6, "text": f"{event}"}) if event else None
+    additions.append({"weight": 5, "text": f"{username} is currently playing {activity}."}) if activity else None
     
-    events = get_events_today()
-    event = ""
-    if len(events) > 0:
-        event = random.choice(events)
-        event_dict = {"weight": 4, "text": f"{event}"}
-        extra_info.append(event_dict)
-        logging.info(f"event: {event} added to extra_info")
+    # choose a random addition based on the weights
+    addition = random.choices(additions, weights=[entry["weight"] for entry in additions], k=1)[0]["text"]
     
-    
-    weights = [entry["weight"] for entry in extra_info]
-    chosen_entry = random.choices(extra_info, weights=weights, k=1)[0]
-    chosen_entry_text = chosen_entry["text"]
-    
-    sys_message = f"You are GuenniGPT, a discord bot that greets people when they join a voice channel. You will be provided with some information on the person and channel. Generate a funny, sarcastic or a rude greeting for them. Only answer in {language}, keep the answer short, at most three sentences."
-    usr_message = f"{name} joined at {time_str}. {chosen_entry_text}"
+    sys_message = f"Generate a {style} greeting for someone who just joined the Discord voice channel in at most three sentences. Only answer in {language} and keep it short."
+    usr_message = f"{username} joined at {time_str}. {addition}"
 
     messages = [
         {"role": "system", "content": sys_message},
@@ -134,27 +127,24 @@ def generate_greeting(user, channel, pLanguage):
         text = get_chatcompletion(messages, temperature=1, max_tokens=256)
         logging.debug(f"generated greeting text: {text}")
     except Exception as e:
+        # if something goes wrong, just use a default message, kinda boring but better than nothing
+        # not even sure if this can happen, but better safe than sorry
         logging.error(f"Error generating chat completion: {e}")
-        text = f"Hey {name}!"
+        text = f"Hey {username}!"
     
     voice.generate(text, filename, pLanguage)
     
     return filename
 
+# Returns a random greeting style from the config
+def get_random_greeting_style():
+    styles = config["greeting_styles"]
+    return random.choices(list(styles.keys()), weights=[styles[entry] for entry in styles])[0]  
 
-def get_events_today():
-    events = []
-    with open("config/events.json", "r") as f:
-        events = json.load(f)
-    
-    # get all entries for the current day
-    # date is key value in format dd.mm
-    today = datetime.datetime.now().strftime("%d.%m")
-    
-    if today not in events:
-        return []
-    
-    return events[today]
+# returns all events for today if there are any
+def get_random_event_today():
+    return random.choice(config["events"][datetime.datetime.now().strftime("%d.%m")]) if datetime.datetime.now().strftime("%d.%m") in config["events"] else None
+
 
 def get_chatcompletion(messages, temperature=1, max_tokens=256):
     logging.debug(f"requesting chatcompletion for message: {messages}")
