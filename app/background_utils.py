@@ -1,7 +1,7 @@
 import json
 import random
 import string
-import logging
+from central_logger import logger
 import os
 import tiktoken
 
@@ -23,6 +23,7 @@ def delete_file(file):
     try:
         os.remove(file)
     except Exception as e:
+        logger.error(f"Failed to delete file: {e}")
         raise ValueError(f"Failed to delete file: {e}")
     
     
