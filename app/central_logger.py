@@ -1,4 +1,5 @@
 import logging
+from config import config
 
 # Get the discord.py logger
 discord_logger = logging.getLogger("discord")
@@ -16,4 +17,9 @@ handler.setFormatter(formatter)
 # Add the handler object to a logger object
 logger = logging.getLogger('GuenniBot')
 logger.addHandler(handler)
-logger.setLevel(logging.DEBUG)
+
+# get logging level from config
+if config["debug"]:
+    logger.setLevel(logging.DEBUG)
+else:
+    logger.setLevel(logging.INFO)
