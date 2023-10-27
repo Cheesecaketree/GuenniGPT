@@ -13,24 +13,38 @@ GuenniGPTs main function is to greet people that join a voice channel. To do so,
 ### Prepare the environment
 
 Create a folder called `config` and a file `keys.json` inside of it.
-You can also create a file called `config.json` in the same folder to configure the bot. If you want to use the events feature, you also need to create a file called `events.json` in the same folder. Events are special texts that are added to the ChatGPT prompts on specific dates.
+You can also create a file called `config.json` in the same folder to configure the bot.
 
-The `config.json` file should look like this:
-
-```json
-{
-    
-}
-```
-
-The `events.json` file should look like this:
+The `config.json` file should look something like this:
 
 ```json
 {
-    "24.12": ["Today is Christmas Eve!"],
-
+    "description": "A discord bot that greets people when they join a voice channel.",
+    "language": "de",
+    "timeout": 600,
+    "greeting_styles": {
+        "sarcastic": 35,
+        "sarcastic and rude": 45,
+        "humorous": 20,
+        "friendly": 5,
+        "old fashioned and formal": 3,
+        "dramatic": 4,
+        "very serious and formal": 3
+    },
+    "events": {
+        "31.10": [
+            "Today is Halloween! Be scray!",
+            "Today is Halloween!"
+        ],
+        "23.12": [
+            "Today is Christmas Eve!"
+        ]
+    }
 }
 ```
+
+You can add more events just by having the date as the key and a list of string as the value. On the specified date, a string from the list will be chosen at random and added to the ChatGPT prompt that generates the greeting text.
+The greeeting styles can change the style of the greetings. The key is the string that gets added to the prompt, the value is a "weight" that determines how likely it is that the style is chosen.
 
 ### Create the bot and get all the keys
 
