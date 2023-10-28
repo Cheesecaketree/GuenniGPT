@@ -4,13 +4,14 @@
     "language": "de",
     "timeout": 600,
     "greeting_styles": {
-        "sarcastic": 35,
-        "sarcastic and rude": 45,
-        "humorous": 20,
-        "friendly": 5,
-        "old fashioned and formal": 3,
-        "dramatic": 4,
-        "very serious and formal": 3
+        "sarcastic": 25,
+        "sarcastic and rude": 25,
+        "humorous": 12,
+        "friendly": 10,
+        "old fashioned and formal": 15,
+        "dramatic": 8,
+        "confused": 5,
+        "annoyed": 7
     },
     "events": {
         "31.10": [

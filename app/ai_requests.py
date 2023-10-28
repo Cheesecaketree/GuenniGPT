@@ -91,9 +91,13 @@ def generate_greeting(user, channel, pLanguage):
     time_str = datetime.datetime.now().strftime("%H:%M")
     activity = user.activity # TODO: Find out what permissions are needed for this (audit log maybe?)
     num_other_people = len(channel.members) - 1
+    logger.debug(f"activity of {username}: {str(activity)}")
+    logger.debug(f"number of other people in channel: {num_other_people}")
     
     event = get_random_event_today()
     style = get_random_greeting_style()
+    logger.debug(f"chosen event: {event}")
+    logger.debug(f"chosen greeting style: {style}")
     
     # weighted additions to the prompt
     additions = [
@@ -153,12 +157,3 @@ def get_chatcompletion(messages, temperature=1, max_tokens=256):
     response_message = remove_emoji.remove_emoji(response_message).replace('\"', '').replace('\"', '')
     return response_message
 
-
-# Dont know why this is here, not used anywhere
-def perform_moderation_check(text_to_check):
-    response = openai.Moderation.create(
-        input=text_to_check,
-    )
-    output = response["results"][0]
-    
-    return output
