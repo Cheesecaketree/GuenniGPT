@@ -34,7 +34,8 @@ mp3_audio_config = tts.AudioConfig(
 def generate(text, filename, language):
     logger.debug("Generating audio with Google Cloud")
     voice = tts.VoiceSelectionParams(
-        language_code=language,
+        language_code="de-DE",
+        name= "de-DE-Wavenet-A",
         ssml_gender=tts.SsmlVoiceGender.FEMALE,
     )
     

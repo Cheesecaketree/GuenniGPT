@@ -83,6 +83,7 @@ async def rating(ctx, name=None):
         await ctx.send("You need to be in a voice channel to use this command")
         return
     
+    logger.debug(f"Generating rating for {name}")
     file = ai.generate_rating(name=name, pLanguage=lang)
         
     await play_audio(file, user)   
@@ -99,6 +100,7 @@ async def compliment(ctx, name=None):
         await ctx.send("You need to be in a voice channel to use this command")
         return
     
+    logger.debug(f"Generating compliment for {name}")
     file = ai.generate_compliment(name=name, pLanguage=lang)
         
     await play_audio(file, user)   
@@ -123,6 +125,7 @@ async def compliment(ctx, name=None):
 
 # connects bot to voice channel of member
 async def create_connection(member):
+    logger.debug("Creating connection to voice channel for user {member.name}")
     member_voice = member.voice.channel
     server = member.guild
 
@@ -136,23 +139,22 @@ async def create_connection(member):
 # enqueues the file and plays it 
 async def play_audio(file, member):
     channel_queue.enqueue(file, channel_name=member.voice.channel.name)
+    logger.debug(f"Enqueued file {file} for {member.name}")
     await create_connection(member)
 
     server = member.guild
-    voice_connection = server.voice_client # Needs existing connection to work!
+    voice_connection = server.voice_client
     
     channel_name = member.voice.channel.name
     queue_index = channel_queue.get_channel_pos(channel_name)
 
     while True:
         await create_connection(member)
-        
         file = channel_queue.dequeue(queue_index)
-        logger.info(f"{file} was removed from queue")
         
-        logger.info(f"Now playing {file}")
         # with open(file, "rb") as f:
         if member.voice is not None:
+            logger.info(f"Now playing file: {file}")
             voice_connection.play(discord.FFmpegPCMAudio(str(file)))
             
             while voice_connection.is_playing():
