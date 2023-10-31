@@ -6,6 +6,7 @@ import datetime
 from central_logger import logger
 import voice_gen as voice
 import random
+import user_activity
 from config import config, keys
 
 
@@ -37,7 +38,6 @@ def generate_compliment(name, pLanguage):
     return filename
 
 def generate_rating(name, pLanguage):
-
     language = "german" # TODO: implement different languages properly
     
     name = name.split("#")[0]
@@ -82,7 +82,6 @@ def generate_talkAbout(topic, pLanguage):
     return filename
     
     
-# TODO: implement new prompt and more data for the prompts to work with
 def generate_greeting(user, channel, pLanguage):
     filename = f"greeting_{randStr(N=4)}" + ".mp3"
     language = "german" if pLanguage == "de" else "english" # TODO: implement different languages properly
@@ -90,7 +89,10 @@ def generate_greeting(user, channel, pLanguage):
     username = str(user).split("#")[0] # shouldn"t be necessary anymore since discord changed usernames, needs testing
     time_str = datetime.datetime.now().strftime("%H:%M")
     activity = user.activity # TODO: Find out what permissions are needed for this (audit log maybe?)
-    num_other_people = len(channel.members) - 1
+    num_other_people = len(channel.members) - 1 
+    time_since_last_leave = user_activity.get_time_since_last_leave(channel.name, username) # in seconds
+    
+    logger.debug(f"time since last leave: {time_since_last_leave}s")
     logger.debug(f"activity of {username}: {str(activity)}")
     logger.debug(f"number of other people in channel: {num_other_people}")
     
@@ -101,21 +103,33 @@ def generate_greeting(user, channel, pLanguage):
     
     # weighted additions to the prompt
     additions = [
-        {"weight": 2, "text": f"There are currently {num_other_people} other people in the channel."},
         {"weight": 1, "text": f"The channel is called {channel.name}."},
-        {"weight": 1, "text": f"The channel is called {channel.name} and there are {num_other_people} other people present."},
         {"weight": 2, "text": f"Today is {datetime.datetime.now().strftime('%A')}."},
+        {"weight": 2, "text": f"It is currently {time_str}."},  
     ]
 
-    additions.append({"weight": 3, "text": f"They are currently alone in the channel"}) if num_other_people == 0 else None
+    additions.append({"weight": 3, "text": f"They were last seen {round(time_since_last_leave/60)} minutes ago."}) if time_since_last_leave > 3600 else additions.append({"weight": 3, "text": f"They were last seen {round(time_since_last_leave / 3600)} hours ago."})
+    additions.append({"weight": 3, "text": f"They are currently alone in the channel."}) if num_other_people == 0 else f"There are currently {num_other_people} other people in the channel."
     additions.append({"weight": 6, "text": f"{event}"}) if event else None
-    additions.append({"weight": 5, "text": f"{username} is currently playing {activity}."}) if activity else None
+    additions.append({"weight": 4, "text": f"Their current activity is {activity}."}) if activity else None
     
     # choose a random addition based on the weights
-    addition = random.choices(additions, weights=[entry["weight"] for entry in additions], k=1)[0]["text"]
+    addition = random.choices(additions, weights=[entry["weight"] for entry in additions], k=1)[0]
+    additions.remove(addition) # remove chosen addition from list so it doesn't get chosen for the second addition
+    addition_text = addition["text"]
+    logger.debug(f"addition text: {addition_text}")
+    
+    # choose a second addition but make sure it doesn"t repeat the first one and only do it occasionally
+    if random.random() < 0.5:
+        logger.debug("Second addition will be added")
+        addition2 = random.choices(additions, weights=[entry["weight"] for entry in additions], k=1)[0]
+        addition2_text = addition2["text"]
+        
+        addition += addition2_text
+        logger.debug(f"new addition text: {addition_text}")
     
     sys_message = f"Generate a {style} greeting for someone who just joined the Discord voice channel in at most three sentences. Only answer in {language} and keep it short."
-    usr_message = f"{username} joined at {time_str}. {addition}"
+    usr_message = f"User {username} joined a channel. {addition_text}"
 
     messages = [
         {"role": "system", "content": sys_message},

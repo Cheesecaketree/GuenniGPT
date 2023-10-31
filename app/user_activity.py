@@ -23,3 +23,7 @@ def set_user_recently_left(channel, member):
     user_last_leave[channel][member] = time.time()
     return
     
+def get_time_since_last_leave(channel, member):
+    if channel not in user_last_leave or member not in user_last_leave[channel]:
+        return 0
+    return time.time() - user_last_leave[channel][member]
