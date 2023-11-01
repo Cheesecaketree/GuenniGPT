@@ -15,10 +15,8 @@ import user_activity
 lang = config["language"] # utils.get_json("config/config.json")["language"]
 description = config["description"] # utils.get_json("config/config.json")["description"]
 
-intents = discord.Intents.default()
-intents.members = True
-intents.presences = True
-intents.message_content = True
+intents = discord.Intents.all()
+
 
 bot = commands.Bot(command_prefix='!', description=description, intents=intents)
 
@@ -69,10 +67,16 @@ async def on_voice_state_update(member, before, after):
 @bot.command(hidden=True)
 @commands.guild_only()
 @commands.is_owner()
-async def sync_commands(ctx):
+async def sync_commands(ctx, guild_id: int = None):
     logger.debug("User used sync command")
-    synced = await ctx.bot.tree.sync(guild=bot.get_guild(ctx.guild))
-    await ctx.send(f"Synced {len(synced)} commands to current guild: {ctx.guild}")
+    
+    synced = await ctx.bot.tree.sync(guild=discord.Object(guild_id) if guild_id else None)
+    
+    
+    logger.debug(f"Guild: {bot.get_guild(ctx.guild.id)}")
+    
+    await ctx.send(f"Synced commands {synced} to {bot.get_guild(ctx.guild.id) if guild_id else 'global'}")
+    
 
 
 @bot.tree.command(name="ping", description="Shows the latency of the bot")
@@ -88,52 +92,51 @@ async def rate(interaction: discord.Interaction, name: str = None):
     
     if user.voice is None:
         logger.debug("User tried to use rating command without being in a voice channel")
-        await interaction.response.send_message("You need to be in a voice channel to use this command")
+        await interaction.response.send_message("You need to be in a voice channel to use this command", ephemeral=True)
         return
     
-    if name is None:
-        name = user.name
-        
+    name = user.name if name is None else name
+    
     logger.debug(f"Generating rating for {name}")
     file = ai.generate_rating(name=name, pLanguage=lang)
         
+    await interaction.response.send_message(f"On my way to rate {name}!", ephemeral=True)
     await play_audio(file, user)   
 
 
 @bot.tree.command(name="compliment", description="Compliments a user. If name is not specified, compliments you")
 async def compliment(interaction: discord.Interaction, name: str = None):
     logger.debug("User used compliment command")
+
     user = interaction.user
-    if name is None:
-        name = user.name
-        
     if user.voice is None:
         logger.debug("User tried to use compliment command without being in a voice channel")
-        await interaction.response.send_message("You need to be in a voice channel to use this command")
+        await interaction.response.send_message("You need to be in a voice channel to use this command", ephemeral=True)
         return
+    
+    name = user.name if name is None else name
     
     logger.debug(f"Generating compliment for {name}")
     file = ai.generate_compliment(name=name, pLanguage=lang)
         
+    await interaction.response.send_message(f"On my way to compliment {name}!", ephemeral=True)
     await play_audio(file, user)   
 
 
-# @bot.command()
-# async def talkAbout(ctx, topic=None):
-#     user = ctx.message.author
-#     if user.voice is None:
-#         await ctx.send("You need to be in a voice channel to use this command")
-#         return
+@bot.tree.command(name="good_night", description="Wishes a user good night.")
+async def good_night(interaction: discord.Interaction):
+    logger.debug("User used good night command")
     
-#     if topic is None:
-#         await ctx.send("Please specify a topic")
-#         return
+    user = interaction.user
+    if user.voice is None:
+        logger.debug("User tried to use good night command without being in a voice channel")
+        await interaction.response.send_message("You need to be in a voice channel to use this command", ephemeral=True)
+        return
     
-#     file = ai.generate_talk_about(topic=topic, pLanguage=lang)
+    file = ai.generate_good_night(user)
     
-#     await play_audio(file, user)
-    
-    
+    await interaction.response.send_message(f"Good night {user.name}!", ephemeral=True)
+    await play_audio(file, user)
 
 
 # connects bot to voice channel of member

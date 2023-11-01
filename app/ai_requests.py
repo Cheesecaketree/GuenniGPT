@@ -124,8 +124,9 @@ def generate_greeting(user, channel, pLanguage):
         logger.debug("Second addition will be added")
         addition2 = random.choices(additions, weights=[entry["weight"] for entry in additions], k=1)[0]
         addition2_text = addition2["text"]
+        logger.debug(f"second addition text: {addition2_text}")
         
-        addition += addition2_text
+        addition_text += addition2_text
         logger.debug(f"new addition text: {addition_text}")
     
     sys_message = f"Generate a {style} greeting for someone who just joined the Discord voice channel in at most three sentences. Only answer in {language} and keep it short."
@@ -158,6 +159,30 @@ def get_random_greeting_style():
 def get_random_event_today():
     return random.choice(config["events"][datetime.datetime.now().strftime("%d.%m")]) if datetime.datetime.now().strftime("%d.%m") in config["events"] else None
 
+# Wishes the user a good night
+def generate_good_night(user):
+    lang = "german"
+    filename = f"good_night_{randStr(N=4)}" + ".mp3"
+    
+    name = user.name
+    styles = ["funny", "creative", "poetic"]
+    
+    
+    sys_message = f"Wish a person in a Discord voice channel a good night. Be {random.choices(styles)}. Always answer in {lang} and keep it under three sentences."
+    usr_message = f"Wish {name} a good night."
+    
+    messages = [
+        {"role": "system", "content": sys_message},
+        {"role": "user", "content": usr_message},
+    ]
+    
+    text = get_chatcompletion(messages, temperature=1, max_tokens=256)
+    logger.debug(f"generated greeting text: {text}")
+    
+    voice.generate(text, filename, lang)
+    
+    return filename
+    
 
 def get_chatcompletion(messages, temperature=1, max_tokens=256):
     logger.debug(f"requesting chatcompletion for message: {messages}")
