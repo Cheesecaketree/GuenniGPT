@@ -97,10 +97,11 @@ async def rate(interaction: discord.Interaction, name: str = None):
     
     name = user.name if name is None else name
     
+    await interaction.response.send_message(f"On my way to rate {name}!", ephemeral=True)
+    
     logger.debug(f"Generating rating for {name}")
     file = ai.generate_rating(name=name, pLanguage=lang)
         
-    await interaction.response.send_message(f"On my way to rate {name}!", ephemeral=True)
     await play_audio(file, user)   
 
 
@@ -116,10 +117,11 @@ async def compliment(interaction: discord.Interaction, name: str = None):
     
     name = user.name if name is None else name
     
+    await interaction.response.send_message(f"On my way to compliment {name}!", ephemeral=True)
+    
     logger.debug(f"Generating compliment for {name}")
     file = ai.generate_compliment(name=name, pLanguage=lang)
-        
-    await interaction.response.send_message(f"On my way to compliment {name}!", ephemeral=True)
+    
     await play_audio(file, user)   
 
 
@@ -133,9 +135,10 @@ async def good_night(interaction: discord.Interaction):
         await interaction.response.send_message("You need to be in a voice channel to use this command", ephemeral=True)
         return
     
-    file = ai.generate_good_night(user)
-    
     await interaction.response.send_message(f"Good night {user.name}!", ephemeral=True)
+    
+    file = ai.generate_good_night(user)
+
     await play_audio(file, user)
 
 
