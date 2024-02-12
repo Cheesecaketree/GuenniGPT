@@ -5,7 +5,6 @@ from config import config
 user_last_leave = {}
 
 # check if user was already in channel in the last few minutes (timeout)
-import json
 
 def get_user_recently_left(channel, member):
     # get timeout from config.json
