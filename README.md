@@ -2,73 +2,124 @@
 
 ## What is GuenniGPT?
 
-GuenniGPT is a simple discord bot and a fun little side project. It is written in Python and uses the discord.py library.
-
-## What can GuenniGPT do?
-
-GuenniGPTs main function is to greet people that join a voice channel. To do so, it generates a random greeting text with the power of [ChatGPT](openai.com/chatgpt). Using the [Google Text-to-Speech API](https://cloud.google.com/text-to-speech) it then converts the text to speech and plays it in the voice channel.
+GuenniGPT is a discord bot and one of my fun little side projects. It is written in Python and uses AI to generate random greetings for people that join a voice channel. It uses the [ChatGPT](openai.com/chatgpt) model to generate the greeting text and supports multiple Text-to-Speech services to convert the text to speech and play it in the voice channel.
 
 ## How to use GuenniGPT?
 
+***Please make sure to read the terms of service and pricing of the respective services before using the bot. More information can be found under [Additonal information](#additional-information).***
+
 ### Prepare the environment
 
-Create a folder called `config` and a file `keys.json` inside of it.
-You can also create a file called `config.json` in the same folder to configure the bot.
+Create a folder called `config` and a file `keys.toml` inside of it.
+You can also create a file called `config.toml` in the same folder to configure the bot.
 
-The `config.json` file should look something like this:
+Example `config.toml` file: <details>
 
-```json
-{
-    "description": "A discord bot that greets people when they join a voice channel.",
-    "language": "de",
-    "timeout": 600,
-    "greeting_styles": {
-        "sarcastic": 35,
-        "sarcastic and rude": 45,
-        "humorous": 20,
-        "friendly": 5,
-        "old fashioned and formal": 3,
-        "dramatic": 4,
-        "very serious and formal": 3
-    },
-    "events": {
-        "31.10": [
-            "Today is Halloween! Be scray!",
-            "Today is Halloween!"
-        ],
-        "23.12": [
-            "Today is Christmas Eve!"
-        ]
-    }
-}
+```toml
+
+description = "A discord bot that greets people when they join a voice channel."
+language = "german"
+timeout = 300
+
+# Available options: "google", "openai", "elevenlabs"
+tts.main = "elevenlabs"
+tts.fallback = "openai"
+
+tts.openai.voice = "shimmer"
+tts.openai.model = "tts-1" 
+
+tts.elevenlabs.voice = "Sarah" 
+tts.elevenlabs.model = "eleven_multilingual_v2" 
+
+tts.google.voice = "de-DE-Wavenet-A"
+
+[greeting-styles]
+"sarcastic" = 25
+"sarcastic and rude" = 25
+"humorous" = 12 
+"old fashioned and formal" = 15
+"dramatic" = 8
+"confused" = 5
+"annoyed" = 7
+
+[events]
+"31.10" = [
+    "Today is Halloween! Be scray!",
+    "Today is Halloween!",
+    ]
+"24.12"= [
+    "Today is Christmas Eve!",
+    "Today is Christmas Eve. Merry Christmas!",
+    "Ho ho ho! It's Christmas Eve!",
+    ]
 ```
 
 You can add more events just by having the date as the key and a list of string as the value. On the specified date, a string from the list will be chosen at random and added to the ChatGPT prompt that generates the greeting text.
 The greeeting styles can change the style of the greetings. The key is the string that gets added to the prompt, the value is a "weight" that determines how likely it is that the style is chosen.
 
+</details>
+
+
+
+
 ### Create the bot and get all the keys
 
-The first step is to create a Discord bot in the [Discord Developer Portal](https://discordpy.readthedocs.io/en/stable/discord.html) and invite it to your server. Add the token to the `keys.json` file.
+The first step is to create a Discord bot in the [Discord Developer Portal](https://discordpy.readthedocs.io/en/stable/discord.html) and invite it to your server. Add the token to the `keys.toml` file as "discod".
 
-For the Text-to-Speech features you need a Google Cloud account and a project with the Text-to-Speech API enabled.
-You also need to [create a service account and download the credentials as a JSON file](https://cloud.google.com/text-to-speech/docs/quickstart-client-libraries#before-you-begin). The json file goes into the `config` folder.
+You will also need an OpenAI API key. This is needed for ChatGPT.
+A guide on how to get a key can be found [here](https://platform.openai.com/docs/quickstart/account-setup).
+Put the key and your organization id in `keys.toml` as "openai" and "openai-org" respectively.
 
-The last key you will need is the [OpenAI API key](https://beta.openai.com/docs/developer-quickstart/your-api-keys). Put the key and your organization id in `keys.json`.
+Depending on the Text-to-Speech service you want to use, you will need different keys.
+For Google Cloud, you will need a project with the Text-to-Speech API enabled. You can than generate key in json format and add it to the `config` folder.
+You can find a guide [here](https://cloud.google.com/text-to-speech/docs/before-you-begin).
 
-The `keys.json` file should look something like this:
+If you instead want the more realistic voices from [Elevenlabs](https://elevenlabs.io/), you will to set up an account and subscribe to one of their plans (free tier available). You can find the API key in the profile settings and add it to the `keys.toml` file under the key "elevenlabs".
 
-```json
-{
-    "openai": "api-key",
-    "openai-org": "your-org-id",
-    "discord": "discord-bot-token",
-}
+The `keys.toml` file should look something like this:
+
+```toml
+
+"openai" = "api-key"
+"openai-org" = "your-org-id"
+"discord" = "discord-bot-token"
+"elevenlabs" = "api-key"
+
 
 ```
 
-## How to run GuenniGPT?
+### Run the bot
 
 You can just clone the repository and run `docker-compose up -d`.
 
-You can also get an image at [GitHub Packages](https://ghcr.io/cheesecaketree/guennigpt:latest) and run it with `docker run -d -v ./config:/usr/src/bot/config ghcr.io/cheesecaketree/guennigpt:latest`.
-Mounting the `./config` directory to `/usr/src/bot/config` is necessary to provide the keys to the bot.
+You can also get an image from [GitHub Packages](https://ghcr.io/cheesecaketree/guennigpt:latest) and run it with `docker run -d -v ./config:/usr/src/bot/config ghcr.io/cheesecaketree/guennigpt:latest`.
+Run this command in the directory where the `config` folder is located, so it gets mounted into the container or change the directory accordingly.
+
+## Additional information
+
+### Costs of running the bot
+
+This bot uses paid APIs. The OpenAI API used for ChatGPT and the Text-to-Speech service will cost money. For generating the texts, the bot uses the ChatGPT 3.5 turbo model, which is quite cheap. But it can still add up depending on how much the bot is used.
+The Text-to-Speech service can be quite expensive though, especially on a busy server.
+When using Elevenlabs as the main engine, you should really look into the pricing and consider if it is worth it for you.
+
+You can find more information on the sites of the respective services.
+
+- Chat GPT and OpenAI TTS: [openai.com](https://openai.com/pricing)
+- Google Cloud TTS: [cloud.google.com](https://cloud.google.com/text-to-speech/pricing)
+- Elevenlabs TTS: [elevenlabs.io](https://elevenlabs.io/pricing)
+
+### Text-to-Speech
+
+Every time the bot generates a greeting, it will use the Text-to-Speech service to convert the text generated by ChatGPT to speech.
+The bot also supports a fallback option, so if the first service fails/you reach the usage limit, it will try the other one. You can configure the fallback in the `config.toml` file.
+
+The bot also supports different voices. You can configure the voice in the `config.toml` file.
+
+OpenAI TTS can use either "tts-1-hd" or "tts-1" as the model. The "hd" model is double the price of the normal one, but I dont really think it's worth it in this application. You can change the model and voice in the config file.
+
+Google Cloud TTS supports a lot of different voices with different pricing. You can also change the voice in the config. Make sure to use the correct voice code and a voice that is available in your language.
+
+Elevenlabs TTS also supports different voices. You can change the voice in the config file. You can also use a different model, but "eleven_multilingual_v2" is the only one that supports multiple languages as of now and I only tested it with this model.
+Pricing is subscription based, so you can choose the plan that fits your needs best.
+

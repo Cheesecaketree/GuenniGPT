@@ -4,3 +4,4 @@
 *key*
 *.log
 gcloud*
+*.code-workspace
