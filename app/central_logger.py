@@ -4,7 +4,7 @@ from config import config
 # Get the discord.py logger
 discord_logger = logging.getLogger("discord")
 
-# Disable the discord.py logger
+# Disable the discord.py logger / set it to CRITICAL
 discord_logger.setLevel(logging.CRITICAL)
 
 # Create a new formatter object
@@ -19,7 +19,9 @@ logger = logging.getLogger('GuenniBot')
 logger.addHandler(handler)
 
 # get logging level from config
-if config["debug"]:
+if config["debug"] == True:
     logger.setLevel(logging.DEBUG)
 else:
     logger.setLevel(logging.INFO)
+
+#logger.setLevel(logging.DEBUG)
