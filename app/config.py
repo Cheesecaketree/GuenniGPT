@@ -7,8 +7,8 @@ def load_config():
     return config
 
 def load_keys():
-    with open('config/keys.json') as f:
-        keys = json.load(f)
+    with open('config/keys.toml', mode="rb") as f:
+        keys = tomllib.load(f)
     return keys
 
 config = load_config()
