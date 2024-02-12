@@ -1,14 +1,14 @@
-description = ""
+description = "A discord bot that greets people when they join a voice channel."
 language = "german" # not tested with other languages, but should work. write the language in english
 
 # Timeout (in seconds) to wait before greeting the same person again
 # For example if user left and rejoined the channel
-timeout = 0
+timeout = 300
 
 # Main TTS Service to use
 # Available options: "google", "openai", "elevenlabs"
 # set up keys depedning on the services you choose!
-tts.main = "openai"
+tts.main = "elevenlabs"
 
 # Fallback TTS engine to use if the main one fails
 # or quota on the main one is used up (especially important for elevenlabs) 
@@ -35,7 +35,7 @@ debug = true
 "humorous" = 12 
 "old fashioned and formal" = 15
 "dramatic" = 8
-confused = 5
+"confused" = 5
 "annoyed" = 7
 
 # special events that are added to the greeting prompt for chatgpt
