@@ -33,7 +33,7 @@ def generate_compliment(name, pLanguage):
     
     logger.debug(f"Generating compliment for {name} with language {pLanguage} \nText: {text}")
     
-    voice.generate(text, filename, pLanguage)
+    voice.generate_audio(text, filename, pLanguage)
     
     return filename
 
@@ -55,7 +55,7 @@ def generate_rating(name, pLanguage):
     
     logger.debug(f"Generating rating for {name} with language {pLanguage} \nText: {text}")
     
-    voice.generate(text, filename, pLanguage)
+    voice.generate_audio(text, filename, pLanguage)
     
     return filename
 
@@ -77,14 +77,14 @@ def generate_talkAbout(topic, pLanguage):
     
     logger.debug(f"Generating talkAbout for {topic} with language {pLanguage} \nText: {text}")
     
-    voice.generate(text, filename, pLanguage)
+    voice.generate_audio(text, filename, pLanguage)
     
     return filename
     
     
 def generate_greeting(user, channel, pLanguage):
     filename = f"greeting_{randStr(N=4)}" + ".mp3"
-    language = "german" if pLanguage == "de" else "english" # TODO: implement different languages properly
+    language = pLanguage
     
     username = str(user).split("#")[0] # shouldn"t be necessary anymore since discord changed usernames, needs testing
     time_str = datetime.datetime.now().strftime("%H:%M")
@@ -146,13 +146,13 @@ def generate_greeting(user, channel, pLanguage):
         logger.error(f"Error generating chat completion: {e}")
         text = f"Hey {username}!"
     
-    voice.generate(text, filename, pLanguage)
+    voice.generate_audio(text, filename, pLanguage)
     
     return filename
 
 # Returns a random greeting style from the config
 def get_random_greeting_style():
-    styles = config["greeting_styles"]
+    styles = config["greeting-styles"]
     return random.choices(list(styles.keys()), weights=[styles[entry] for entry in styles])[0]  
 
 # returns all events for today if there are any
@@ -179,14 +179,14 @@ def generate_good_night(user):
     text = get_chatcompletion(messages, temperature=1, max_tokens=256)
     logger.debug(f"generated greeting text: {text}")
     
-    voice.generate(text, filename, lang)
+    voice.generate_audio(text, filename, lang)
     
     return filename
     
 
 def get_chatcompletion(messages, temperature=1, max_tokens=256):
     logger.debug(f"requesting chatcompletion for message: {messages}")
-    response = openai.ChatCompletion.create(
+    response = openai.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=messages,
         temperature=temperature,

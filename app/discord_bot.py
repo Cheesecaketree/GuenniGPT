@@ -12,8 +12,8 @@ import background_utils as utils
 import user_activity
 
 
-lang = config["language"] # utils.get_json("config/config.json")["language"]
-description = config["description"] # utils.get_json("config/config.json")["description"]
+lang = config["language"]
+description = config["description"]
 
 intents = discord.Intents.all()
 

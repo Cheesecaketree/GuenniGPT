@@ -1,0 +1,76 @@
+description = "A discord bot that greets people when they join a voice channel."
+language = "german" # not tested with other languages, but should work. write the language in english
+
+# Timeout (in seconds) to wait before greeting the same person again
+# For example if user left and rejoined the channel
+timeout = 300
+
+# Main TTS Service to use
+# Available options: "google", "openai", "elevenlabs"
+# set up keys depedning on the services you choose!
+tts.main = "elevenlabs"
+
+# Fallback TTS engine to use if the main one fails
+# or quota on the main one is used up (especially important for elevenlabs) 
+# if empty, the main TTS engine will be used, which could fail
+tts.fallback = "openai"
+
+
+tts.openai.voice = "shimmer"
+tts.openai.model = "tts-1" # can be changed to "tts-1" to lower cost
+
+tts.elevenlabs.voice = "Sarah" # voice has to be available in your account
+tts.elevenlabs.model = "eleven_multilingual_v2" 
+
+tts.google.voice = "de-DE-Wavenet-A" # pay attention to the language support of the voice!
+
+
+# spams your console with a bunch of debug messages 
+debug = true
+
+# stlyes for the greeting
+[greeting-styles]
+"sarcastic" = 25
+"sarcastic and rude" = 25
+"humorous" = 12 
+"old fashioned and formal" = 15
+"dramatic" = 8
+"confused" = 5
+"annoyed" = 7
+
+# special events that are added to the greeting prompt for chatgpt
+[events]
+"31.10" = [
+    "Today is Halloween! Be scray!",
+    "Today is Halloween!",
+    ]
+"24.12"= [
+    "Today is Christmas Eve!",
+    "Today is Christmas Eve. Merry Christmas!",
+    "Ho ho ho! It's Christmas Eve!",
+    ]
+"31.12" = [
+    "Today is New Year's Eve!"
+    ]
+"01.01" = [
+    "Today is New Year's Day!",
+    "Today is New Year's Day. Happy New Year!",
+    ]
+"14.02" = [
+    "Today is Valentine's Day!",
+    "Today is Valentine's Day. Happy Valentine's Day!",
+    ]
+"01.04" = [
+    "Today is April Fool's Day!",
+    "Happy April Fool's Day!"
+    ]
+"04.05" = [
+    "Today is Star Wars Day!",
+    "It's Star Wars Day. May the 4th be with you!",
+    "May the force be with you. It's Star Wars Day!",
+    ]
+"19.09" = [
+    "Today is Talk Like a Pirate Day!",
+    ]
+
+
