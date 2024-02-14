@@ -17,6 +17,7 @@ description = config["description"]
 
 intents = discord.Intents.all()
 
+arg_length = config["max_arg_length"] # max length of arguments in commands
 
 bot = commands.Bot(command_prefix='!', description=description, intents=intents)
 
@@ -54,7 +55,7 @@ async def on_voice_state_update(member, before, after):
             logger.info(f"{username} recently joined {channel_name}")
         else:
             # generates audio and plays it
-            file = ai.generate_greeting(user=member, channel=channel, pLanguage=channel_lang)
+            file = ai.generate_greeting(user=member, channel=channel)
             try:
                 await play_audio(file, member)
             except Exception as e:
@@ -82,64 +83,87 @@ async def sync_commands(ctx, guild_id: int = None):
 @bot.tree.command(name="ping", description="Shows the latency of the bot")
 async def ping(interaction: discord.Interaction):
     logger.debug("User used ping command")
-    await interaction.response.send_message(f"Pong in {round(bot.latency * 1000)}ms")
+    await interaction.response.send_message(f"Pong ({round(bot.latency * 1000)}ms)", ephemeral=True)
 
 
 @bot.tree.command(name="rate", description="Rates a user. If name is not specified, rates you")
 async def rate(interaction: discord.Interaction, name: str = None):
     logger.debug("User used rate command")
     user = interaction.user
+    name = user.name if name is None else name
     
+    # check if input is too long
+    if len(name) > arg_length:
+        logger.debug("User tried to use rate command with too long name")
+        await interaction.response.send_message(f"Name too long. Max length is {arg_length} characters", ephemeral=True)
+        return
+    
+    # check if user is in a voice channel
     if user.voice is None:
         logger.debug("User tried to use rating command without being in a voice channel")
         await interaction.response.send_message("You need to be in a voice channel to use this command", ephemeral=True)
         return
     
-    name = user.name if name is None else name
     
     await interaction.response.send_message(f"On my way to rate {name}!", ephemeral=True)
     
     logger.debug(f"Generating rating for {name}")
-    file = ai.generate_rating(name=name, pLanguage=lang)
-        
+    file = ai.generate_rating(name=name)
+     
     await play_audio(file, user)   
 
 
 @bot.tree.command(name="compliment", description="Compliments a user. If name is not specified, compliments you")
 async def compliment(interaction: discord.Interaction, name: str = None):
     logger.debug("User used compliment command")
-
     user = interaction.user
+    name = user.name if name is None else name
+    
+    # check if input is too long
+    if len(name) > arg_length:
+        logger.debug("User tried to use compliment command with too long name")
+        await interaction.response.send_message(f"Name too long. Max length is {arg_length} characters", ephemeral=True)
+        return
+    
+    # check if user is in a voice channel
     if user.voice is None:
         logger.debug("User tried to use compliment command without being in a voice channel")
         await interaction.response.send_message("You need to be in a voice channel to use this command", ephemeral=True)
         return
     
-    name = user.name if name is None else name
-    
     await interaction.response.send_message(f"On my way to compliment {name}!", ephemeral=True)
     
     logger.debug(f"Generating compliment for {name}")
-    file = ai.generate_compliment(name=name, pLanguage=lang)
+    file = ai.generate_compliment(name=name)
     
     await play_audio(file, user)   
 
 
 @bot.tree.command(name="good_night", description="Wishes a user good night.")
-async def good_night(interaction: discord.Interaction):
+async def good_night(interaction: discord.Interaction, name: str = None):
     logger.debug("User used good night command")
-    
     user = interaction.user
+    name = user.name if name is None else name
+    
+    # check if input is too long
+    if len(name) > arg_length:
+        logger.debug("User tried to use good night command with too long name")
+        await interaction.response.send_message(f"Name too long. Max length is {arg_length} characters", ephemeral=True)
+        return
+    
+    # check if user is in a voice channel
     if user.voice is None:
         logger.debug("User tried to use good night command without being in a voice channel")
         await interaction.response.send_message("You need to be in a voice channel to use this command", ephemeral=True)
         return
     
-    await interaction.response.send_message(f"Good night {user.name}!", ephemeral=True)
+    await interaction.response.send_message(f"Good night {name}!", ephemeral=True)
     
     file = ai.generate_good_night(user)
 
     await play_audio(file, user)
+
+
 
 
 # connects bot to voice channel of member

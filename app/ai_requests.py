@@ -1,7 +1,6 @@
 import openai
 from background_utils import randStr
 import remove_emoji
-import json
 import datetime
 from central_logger import logger
 import voice_gen as voice
@@ -15,8 +14,8 @@ openai.api_key = keys["openai"]
 openai.organization = keys["openai-org"]
 
 
-def generate_compliment(name, pLanguage):
-    language = "german" # TODO: implement different languages properly
+def generate_compliment(name):
+    language = config["language"]
     
     name = name.split("#")[0]
     filename = f"rating_{randStr(N=4)}" + ".mp3"
@@ -31,14 +30,14 @@ def generate_compliment(name, pLanguage):
     
     text = get_chatcompletion(messages, temperature=0.95, max_tokens=256)
     
-    logger.debug(f"Generating compliment for {name} with language {pLanguage} \nText: {text}")
+    logger.debug(f"Generating compliment for {name} with language {language} \nText: {text}")
     
-    voice.generate_audio(text, filename, pLanguage)
+    voice.generate_audio(text, filename, language)
     
     return filename
 
-def generate_rating(name, pLanguage):
-    language = "german" # TODO: implement different languages properly
+def generate_rating(name):
+    language = config["language"]
     
     name = name.split("#")[0]
     filename = f"rating_{randStr(N=4)}" + ".mp3"
@@ -53,38 +52,16 @@ def generate_rating(name, pLanguage):
     
     text = get_chatcompletion(messages, temperature=0.95, max_tokens=256)
     
-    logger.debug(f"Generating rating for {name} with language {pLanguage} \nText: {text}")
+    logger.debug(f"Generating rating for {name} with language {language} \nText: {text}")
     
-    voice.generate_audio(text, filename, pLanguage)
-    
-    return filename
-
-# TODO: implement feature or delete this function
-def generate_talkAbout(topic, pLanguage):
-    language = "german" # TODO: implement different languages properly
-    
-    filename = f"talkAbout_{randStr(N=4)}" + ".mp3"
-    
-    system_message = f"You are a discord bot that can talk. You will get a topic and then talk about it. Be creative. Keep it short."
-    user_message = f"Talk about {topic}.lang={language}"
-    
-    messages = [
-        {"role": "system", "content": system_message},
-        {"role": "user", "content": user_message},
-    ]
-    
-    text = get_chatcompletion(messages, temperature=0.95, max_tokens=256)
-    
-    logger.debug(f"Generating talkAbout for {topic} with language {pLanguage} \nText: {text}")
-    
-    voice.generate_audio(text, filename, pLanguage)
+    voice.generate_audio(text, filename, language)
     
     return filename
     
     
-def generate_greeting(user, channel, pLanguage):
+def generate_greeting(user, channel):
     filename = f"greeting_{randStr(N=4)}" + ".mp3"
-    language = pLanguage
+    language = config["language"]
     
     username = str(user).split("#")[0] # shouldn"t be necessary anymore since discord changed usernames, needs testing
     time_str = datetime.datetime.now().strftime("%H:%M")
@@ -146,7 +123,7 @@ def generate_greeting(user, channel, pLanguage):
         logger.error(f"Error generating chat completion: {e}")
         text = f"Hey {username}!"
     
-    voice.generate_audio(text, filename, pLanguage)
+    voice.generate_audio(text, filename, language)
     
     return filename
 
@@ -161,14 +138,14 @@ def get_random_event_today():
 
 # Wishes the user a good night
 def generate_good_night(user):
-    lang = "german"
+    language = config["language"]
     filename = f"good_night_{randStr(N=4)}" + ".mp3"
     
     name = user.name
     styles = ["funny", "creative", "poetic"]
     
     
-    sys_message = f"Wish a person in a Discord voice channel a good night. Be {random.choices(styles)}. Always answer in {lang} and keep it under three sentences."
+    sys_message = f"Wish a person in a Discord voice channel a good night. Be {random.choices(styles)}. Always answer in {language} and keep it under three sentences."
     usr_message = f"Wish {name} a good night."
     
     messages = [
@@ -179,7 +156,7 @@ def generate_good_night(user):
     text = get_chatcompletion(messages, temperature=1, max_tokens=256)
     logger.debug(f"generated greeting text: {text}")
     
-    voice.generate_audio(text, filename, lang)
+    voice.generate_audio(text, filename, language)
     
     return filename
     
