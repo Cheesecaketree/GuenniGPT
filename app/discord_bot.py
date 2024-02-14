@@ -55,7 +55,7 @@ async def on_voice_state_update(member, before, after):
             logger.info(f"{username} recently joined {channel_name}")
         else:
             # generates audio and plays it
-            file = ai.generate_greeting(user=member, channel=channel, pLanguage=channel_lang)
+            file = ai.generate_greeting(user=member, channel=channel)
             try:
                 await play_audio(file, member)
             except Exception as e:
@@ -108,7 +108,7 @@ async def rate(interaction: discord.Interaction, name: str = None):
     await interaction.response.send_message(f"On my way to rate {name}!", ephemeral=True)
     
     logger.debug(f"Generating rating for {name}")
-    file = ai.generate_rating(name=name, pLanguage=lang)
+    file = ai.generate_rating(name=name)
      
     await play_audio(file, user)   
 
@@ -134,7 +134,7 @@ async def compliment(interaction: discord.Interaction, name: str = None):
     await interaction.response.send_message(f"On my way to compliment {name}!", ephemeral=True)
     
     logger.debug(f"Generating compliment for {name}")
-    file = ai.generate_compliment(name=name, pLanguage=lang)
+    file = ai.generate_compliment(name=name)
     
     await play_audio(file, user)   
 
