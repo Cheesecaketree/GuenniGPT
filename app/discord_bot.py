@@ -17,7 +17,7 @@ description = config["description"]
 
 intents = discord.Intents.all()
 
-arg_length = config["max_arg_length"] # max length of arguments in commands
+arg_length = config["max_arg_length"] if "max_arg_length" in config else 50 # max length of arguments in commands, 50 if not configured
 
 bot = commands.Bot(command_prefix='!', description=description, intents=intents)
 
