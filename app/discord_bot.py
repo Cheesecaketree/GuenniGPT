@@ -83,7 +83,7 @@ async def sync_commands(ctx, guild_id: int = None):
 @bot.tree.command(name="ping", description="Shows the latency of the bot")
 async def ping(interaction: discord.Interaction):
     logger.debug("User used ping command")
-    await interaction.response.send_message(f"Pong ({round(bot.latency * 1000)}ms)")
+    await interaction.response.send_message(f"Pong ({round(bot.latency * 1000)}ms)", ephemeral=True)
 
 
 @bot.tree.command(name="rate", description="Rates a user. If name is not specified, rates you")
