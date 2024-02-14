@@ -140,10 +140,10 @@ async def compliment(interaction: discord.Interaction, name: str = None):
 
 
 @bot.tree.command(name="good_night", description="Wishes a user good night.")
-async def good_night(interaction: discord.Interaction):
+async def good_night(interaction: discord.Interaction, name: str = None):
     logger.debug("User used good night command")
     user = interaction.user
-    name = user.name
+    name = user.name if name is None else name
     
     # check if input is too long
     if len(name) > arg_length:
