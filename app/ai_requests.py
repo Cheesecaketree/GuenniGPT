@@ -57,28 +57,6 @@ def generate_rating(name):
     voice.generate_audio(text, filename, language)
     
     return filename
-
-# TODO: implement feature or delete this function
-def generate_talkAbout(topic):
-    language = config["language"]
-    
-    filename = f"talkAbout_{randStr(N=4)}" + ".mp3"
-    
-    system_message = f"You are a discord bot that can talk. You will get a topic and then talk about it. Be creative. Keep it short."
-    user_message = f"Talk about {topic}.lang={language}"
-    
-    messages = [
-        {"role": "system", "content": system_message},
-        {"role": "user", "content": user_message},
-    ]
-    
-    text = get_chatcompletion(messages, temperature=0.95, max_tokens=256)
-    
-    logger.debug(f"Generating talkAbout for {topic} with language {language} \nText: {text}")
-    
-    voice.generate_audio(text, filename, language)
-    
-    return filename
     
     
 def generate_greeting(user, channel):
