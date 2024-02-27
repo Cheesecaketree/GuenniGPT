@@ -63,13 +63,13 @@ def generate_greeting(user, channel):
     filename = f"greeting_{randStr(N=4)}" + ".mp3"
     language = config["language"]
     
-    username = str(user).split("#")[0] # shouldn"t be necessary anymore since discord changed usernames, needs testing
+    username = str(user).split("#")[0] if not type(user) == str else user # if user is a string, it's already the username
     time_str = datetime.datetime.now().strftime("%H:%M")
-    activity = user.activity # TODO: Find out what permissions are needed for this (audit log maybe?)
+    activity = user.activity if user.activity else None
     num_other_people = len(channel.members) - 1 
-    time_since_last_leave = user_activity.get_time_since_last_leave(channel.name, username) # in seconds
+    # time_since_last_leave = user_activity.get_time_since_last_leave(channel.name, username) # in seconds
     
-    logger.debug(f"time since last leave: {time_since_last_leave}s")
+    # logger.debug(f"time since last leave: {time_since_last_leave}s")
     logger.debug(f"activity of {username}: {str(activity)}")
     logger.debug(f"number of other people in channel: {num_other_people}")
     
@@ -85,7 +85,7 @@ def generate_greeting(user, channel):
         {"weight": 2, "text": f"It is currently {time_str}."},  
     ]
 
-    additions.append({"weight": 3, "text": f"They were last seen {round(time_since_last_leave/60)} minutes ago."}) if time_since_last_leave > 3600 else additions.append({"weight": 3, "text": f"They were last seen {round(time_since_last_leave / 3600)} hours ago."})
+    #additions.append({"weight": 3, "text": f"They were last seen {round(time_since_last_leave/60)} minutes ago."}) if time_since_last_leave > 3600 else additions.append({"weight": 3, "text": f"They were last seen {round(time_since_last_leave / 3600)} hours ago."})
     additions.append({"weight": 3, "text": f"They are currently alone in the channel."}) if num_other_people == 0 else f"There are currently {num_other_people} other people in the channel."
     additions.append({"weight": 6, "text": f"{event}"}) if event else None
     additions.append({"weight": 4, "text": f"Their current activity is {activity}."}) if activity else None
