@@ -139,6 +139,33 @@ async def compliment(interaction: discord.Interaction, name: str = None):
     await play_audio(file, user)   
 
 
+@bot.tree.command(name="hello", description="Say hello to someone")
+async def hello(interaction: discord.Interaction, name: str = None):
+    logger.debug("User used hello command")
+    user = interaction.user
+    if name is None:
+        logger.debug("User did not specify name")
+        await interaction.response.send_message("You need to specify a name", ephemeral=True)
+        return
+    
+    # check if input is too long
+    if len(name) > arg_length:
+        logger.debug("User tried to use hello command with too long name")
+        await interaction.response.send_message(f"Name too long. Max length is {arg_length} characters", ephemeral=True)
+        return
+    
+    # check if user is in a voice channel
+    if user.voice is None:
+        logger.debug("User tried to use hello command without being in a voice channel")
+        await interaction.response.send_message("You need to be in a voice channel to use this command", ephemeral=True)
+        return
+    
+    await interaction.response.send_message(f"On my way to say hello to {name}!", ephemeral=True)
+    
+    file = ai.generate_greeting(name, user.voice.channel)
+
+    await play_audio(file, user)
+
 @bot.tree.command(name="good_night", description="Wishes a user good night.")
 async def good_night(interaction: discord.Interaction, name: str = None):
     logger.debug("User used good night command")
