@@ -66,8 +66,10 @@ def generate_greeting(user, channel):
     username = str(user).split("#")[0] if not type(user) == str else user # if user is a string, it's already the username
     time_str = datetime.datetime.now().strftime("%H:%M")
     
-
-    activity = user.activity if user.activity or not type(user) == str else None
+    if not type(user) == str:
+        activity = user.activity if user.activity else None
+    else:
+        activity = None
 
     num_other_people = len(channel.members) - 1 
     # time_since_last_leave = user_activity.get_time_since_last_leave(channel.name, username) # in seconds
