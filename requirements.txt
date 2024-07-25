@@ -3,4 +3,4 @@ openai
 tiktoken
 google-cloud-texttospeech
 elevenlabs
-qroq
+groq
