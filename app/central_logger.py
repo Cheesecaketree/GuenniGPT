@@ -1,5 +1,5 @@
 import logging
-from config import config
+from app_context import config
 
 # Get the discord.py logger
 discord_logger = logging.getLogger("discord")

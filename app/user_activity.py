@@ -1,6 +1,6 @@
 from central_logger import logger
 import time
-from config import config
+from app_context import config
 
 user_last_leave = {}
 

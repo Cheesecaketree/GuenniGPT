@@ -16,7 +16,7 @@ def enqueue(filename, channel_name):
 
     try:
         queues[get_channel_pos(channel_name)].enqueue(filename)
-        logger.debug(f"{filename} added to channel queue {channel_name}")
+        
     except:
         logger.critical("filename could not be added to channel queue! enqueue()")
     
