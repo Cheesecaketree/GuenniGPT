@@ -5,38 +5,54 @@ language = "german" # not tested with other languages, but should work. write th
 # For example if user left and rejoined the channel
 timeout = 0
 
-
-# Primary services
-llm.service = "Groq" # OpenAI, Groq
-llm.model = "llama-3.1-70b-versatile" # whatever is available, idk
-
-tts.service = "openai" # openai, elevenlabs
-
-
-# Fallback services
-# Used if main one fails. Especially important for apis with quotas like elevenlabs
-fallback.llm.service = "OpenAI"
-fallback.llm.model = "gpt-4o-mini"
-
-fallback.tts.service = "openai"
-
-# TTS service specific config
-
-tts.openai.voice = "shimmer"
-tts.openai.model = "tts-1" # can be changed to "tts-1" for lower cost or hd for better quality
-
-tts.elevenlabs.voice = "EXAVITQu4vr4xnSDxMaL" # voice has to be available in your account!
-tts.elevenlabs.model = "eleven_multilingual_v2" 
-
-
 # max length for command arguments
 max_arg_length = 50
 
 # spams your console with a bunch of debug messages 
 debug = true
 
+# LLM Config
+[llm]
+service = "Groq" # OpenAI, Groq
+model = "llama-3.1-70b-versatile" # whatever is available, idk
+fallback_service = "OpenAI"
+fallback_model = "gpt-4o-mini"
+
+
+# TTS config
+[tts]
+service = "openai"
+voice = "shimmer"
+model = "tts-1" # tts-1-hd for higher quality and higher cost
+fallback_service = "elevenlabs"
+fallback_voice = "EXAVITQu4vr4xnSDxMaL"
+fallback_model = "eleven_multilingual_v2" 
+
+
+[greeting_prompt]
+time_format = "%I:%M %p"
+date_format = "%A"
+system = """
+You are a Discord Bot that greets people when they enter a voice channel. Only answer in {language}.
+Stick to the instructions!
+Your purpose is to make the experience in the voice channel more fun. Answer in roughly 4 sentences.
+You get a bunch of information. No need to use them all. Just pick what fits best.
+Today is {date}. It is currently {time}"""
+user = """
+Generate a {style} greeting for "{username}" who just entered the Discord voice channel "{channelname}".
+{activity} {other_people} {event}
+"""
+
+
+# split like this to remove parts that may be null (activity or event mainly)
+[greeting_prompt.additions]
+other_people_text = "There are currently {num_other_people} in the channel"
+activity_text = "Their current activity is {activity}."
+
+
+
 # stlyes for the greeting
-[greeting-styles]
+[greeting_prompt.styles]
 "sarcastic" = 25
 "sarcastic and rude" = 25
 "humorous" = 12 
@@ -50,6 +66,7 @@ debug = true
 
 # special events that are added to the greeting prompt for chatgpt
 [events]
+use_events = true
 "31.10" = [
     "Today is Halloween! Be scray!",
     "Today is Halloween!",
