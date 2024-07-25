@@ -4,7 +4,7 @@ from openai import OpenAI
 
 import os
 from central_logger import logger
-from config import config, keys
+from app_context import config, primary_tts, fallback_tts
 
 
 # TODO: implement different TTS services
@@ -43,11 +43,10 @@ def tts_google(text, filename, language):
     
     return response.audio_content
 
-# TODO: check if quota is checkable (doesnt seem like it, because pay as you go i guess)
 def tts_openai(text, filename, language):
     logger.debug("Generating audio with OpenAI")
     
-    client = OpenAI(api_key = keys["openai"])
+    client = OpenAI(api_key = config['keys']["openai"])
 
     voice = config["tts"]["openai"]["voice"]
     
@@ -101,45 +100,7 @@ def tts_elevenlabs(text, filename, language):
     
     
 def generate_audio(text, filename, language):
-    options = {
-        "google": tts_google,
-        "openai": tts_openai,
-        "elevenlabs": tts_elevenlabs
-    }
-    
-    used = ""
-    
-    # figure out main and falbback service
-    # options: google, openai, elevenlabs
-    main_service = config["tts"]["main"]
-    fallback_service = config["tts"]["fallback"]
-    
-    if main_service not in options:
-        logger.warn(f"Main TTS service {main_service} not supported")
-        if fallback_service not in options:
-            logger.fatal(f"No valid TTS service configured")
-            raise ValueError("No valid TTS service configured")
-        
-        
-    try:
-        logger.info(f"Using main TTS service {main_service} to generate audio")
-        response = options[main_service](text, filename, language)
-        used = main_service
-    except Exception as e:
-        # main tts failed or quota exceeded, use fallback if available
-        logger.error(f"Error using main TTS service {main_service}: {e}")
-        
-        if fallback_service not in options:
-            logger.critical(f"Error using main TTS service {main_service} and no valid fallback service configured")
-            raise ValueError(f"Error using main TTS service {main_service} and no valid fallback service configured")
-        
-        try:
-            logger.info(f"Using fallback TTS service {fallback_service} to generate audio")
-            response = options[fallback_service](text, filename, language)
-            used = fallback_service
-        except Exception as e_fallback:
-            logger.error(f"Error using fallback TTS service {fallback_service}: {e_fallback}")
-            return
+    primary_tts.generate_speech(text)
         
 
     if response is not None:

@@ -5,7 +5,7 @@ from central_logger import logger
 import asyncio
 import datetime
 
-from config import config, keys
+from app_context import config
 import ai_requests as ai
 import channel_queue
 import background_utils as utils
@@ -241,6 +241,6 @@ async def play_audio(file, member):
             return
         logger.debug("Queue not empty. Bot is playing next file")
         
-
-token = keys["discord"]
+        
+token = config['keys']["discord"]
 bot.run(token)

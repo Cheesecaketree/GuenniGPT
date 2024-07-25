@@ -12,5 +12,14 @@ def load_keys():
     return keys
 
 config = load_config()
+config = config['keys'] = load_keys()
 
-keys = load_keys()
+
+from modules.service_factory import ServiceFactory
+    
+# TODO implement fallback
+factory = ServiceFactory()
+primary_llm = factory.create_language_model(config)
+
+primary_tts = factory.create_text_to_speech_engine(config)
+fallback_tts = NotImplemented
