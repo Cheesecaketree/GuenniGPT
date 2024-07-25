@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+import io
 
 from central_logger import logger
 import asyncio
@@ -58,9 +59,10 @@ async def on_voice_state_update(member, before, after):
             file = ai.generate_greeting(user=member, channel=channel)
             try:
                 await play_audio(file, member)
+                
             except Exception as e:
                 logger.error(f"Error playing audio file: {e}")
-                utils.delete_file(str(file))
+                
         return
     
 
@@ -195,7 +197,7 @@ async def good_night(interaction: discord.Interaction, name: str = None):
 
 # connects bot to voice channel of member
 async def create_connection(member):
-    logger.debug("Creating connection to voice channel for user {member.name}")
+    logger.debug(f"Creating connection to voice channel for user {member.name}")
     member_voice = member.voice.channel
     server = member.guild
 
@@ -207,9 +209,10 @@ async def create_connection(member):
 
     
 # enqueues the file and plays it 
-async def play_audio(file, member):
+# file is a byte stream object
+async def play_audio(file, member):    
     channel_queue.enqueue(file, channel_name=member.voice.channel.name)
-    logger.debug(f"Enqueued file {file} for {member.name}")
+    
     await create_connection(member)
 
     server = member.guild
@@ -220,22 +223,25 @@ async def play_audio(file, member):
 
     while True:
         await create_connection(member)
-        file = channel_queue.dequeue(queue_index)
         
-        # with open(file, "rb") as f:
+        queue_file = channel_queue.dequeue(queue_index)
+        
+        
         if member.voice is not None:
-            logger.info(f"Now playing file: {file}")
-            voice_connection.play(discord.FFmpegPCMAudio(str(file)))
+            audio_stream = io.BytesIO(queue_file)
+            
+            ffmpeg_audio = discord.FFmpegPCMAudio(audio_stream, pipe=True)
+            
+            voice_connection.play(ffmpeg_audio, after=lambda e: print(f"Player error: {e}") if e else None)
             
             while voice_connection.is_playing():
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(1)
                 
             await voice_connection.disconnect()
         voice_connection.cleanup() 
-        utils.delete_file(str(file))
-        channel_queue.queues[queue_index].done()
         
-
+        channel_queue.queues[queue_index].done()
+    
         if channel_queue.queues[queue_index].isEmpty():
             logger.debug("Queue is empty. Bot has disconnected.")
             return
