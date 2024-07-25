@@ -2,6 +2,9 @@ from modules.language_models import LanguageModel, OpenAIChatGPT, GroqChat
 from modules.text_to_speech import TextToSpeechEngine, ElevenlabsTTS, OpenAITTS
 
 
+# TODO implement fallback
+# 
+
 class ServiceFactory:
     def create_language_model(self, config):
         llm_service = config['llm']['service']

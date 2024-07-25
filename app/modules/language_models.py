@@ -24,8 +24,6 @@ class OpenAIChatGPT(LanguageModel):
             stream=False
         )
         
-        # TODO add cleanup (remove emojis?)
-        
         return response.choices[0].message.content
         
         
@@ -69,8 +67,7 @@ Today is {Thursday, 25.07.2024}. It is currently {00:44 AM}
             stream=False,
             stop=None,
         )
-        
-        # TODO add text cleanup?
+
         return response.choices[0].message.content
         
         
