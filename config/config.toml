@@ -35,7 +35,7 @@ date_format = "%A"
 system = """
 You are a Discord Bot that greets people when they enter a voice channel. Only answer in {language}.
 Stick to the instructions!
-Your purpose is to make the experience in the voice channel more fun. Answer in roughly 4 sentences.
+Your purpose is to make the experience in the voice channel more fun. Answer in roughly 3 sentences.
 You get a bunch of information. No need to use them all. Just pick what fits best.
 Today is {date}. It is currently {time}"""
 user = """

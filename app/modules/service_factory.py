@@ -18,8 +18,8 @@ class ServiceFactory:
     def create_text_to_speech_engine(self,config):
         tts_service = config['tts']['service']
         
-        tts_model = config['tts'][tts_service]['model']
-        tts_voice = config['tts'][tts_service]['voice']
+        tts_model = config['tts']['model']
+        tts_voice = config['tts']['voice']
         
         if tts_service == "openai":
             return OpenAITTS(api_key=config['keys']['openai'], model=tts_model, voice=tts_voice)

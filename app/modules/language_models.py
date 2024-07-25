@@ -46,7 +46,3 @@ class GroqChat(LanguageModel):
 
         return response.choices[0].message.content
         
-        
-    
-    
-    
