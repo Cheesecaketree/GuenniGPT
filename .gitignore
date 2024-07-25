@@ -5,3 +5,4 @@
 *.log
 gcloud*
 *.code-workspace
+.vscode
