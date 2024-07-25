@@ -3,7 +3,7 @@ language = "german" # not tested with other languages, but should work. write th
 
 # Timeout (in seconds) to wait before greeting the same person again
 # For example if user left and rejoined the channel
-timeout = 0
+timeout = 300
 
 # max length for command arguments
 max_arg_length = 50
