@@ -3,33 +3,30 @@ language = "german" # not tested with other languages, but should work. write th
 
 # Timeout (in seconds) to wait before greeting the same person again
 # For example if user left and rejoined the channel
-timeout = 300
+timeout = 0
 
 
 # Primary services
-LLM.service = "Groq" # OpenAI, Groq
-LLM.model = "llama-3.1-70b-versatile" # whatever is available, idk
+llm.service = "Groq" # OpenAI, Groq
+llm.model = "llama-3.1-70b-versatile" # whatever is available, idk
 
-TTS.service = "elevenlabs" # openai, elevenlabs, Google
+tts.service = "openai" # openai, elevenlabs
 
 
 # Fallback services
 # Used if main one fails. Especially important for apis with quotas like elevenlabs
-fallback.LLM.service = "OpenAI"
-fallback.LLM.model = "gpt-4o-mini"
+fallback.llm.service = "OpenAI"
+fallback.llm.model = "gpt-4o-mini"
 
-fallback.TTS.service = "openai"
+fallback.tts.service = "openai"
 
 # TTS service specific config
 
-TTS.openai.voice = "shimmer"
-TTS.openai.model = "tts-1" # can be changed to "tts-1" for lower cost or hd for better quality
+tts.openai.voice = "shimmer"
+tts.openai.model = "tts-1" # can be changed to "tts-1" for lower cost or hd for better quality
 
-TTS.elevenlabs.voice = "EXAVITQu4vr4xnSDxMaL" # voice has to be available in your account!
-TTS.elevenlabs.model = "eleven_multilingual_v2" 
-
-TTS.google.voice = "de-DE-Wavenet-A" # pay attention to the language support of the voice!
-
+tts.elevenlabs.voice = "EXAVITQu4vr4xnSDxMaL" # voice has to be available in your account!
+tts.elevenlabs.model = "eleven_multilingual_v2" 
 
 
 # max length for command arguments
