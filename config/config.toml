@@ -5,24 +5,32 @@ language = "german" # not tested with other languages, but should work. write th
 # For example if user left and rejoined the channel
 timeout = 300
 
-# Main TTS Service to use
-# Available options: "google", "openai", "elevenlabs"
-# set up keys depedning on the services you choose!
-tts.main = "elevenlabs"
 
-# Fallback TTS engine to use if the main one fails
-# or quota on the main one is used up (especially important for elevenlabs) 
-# if empty, the main TTS engine will be used, which could fail
-tts.fallback = "openai"
+# Primary services
+LLM.service = "Groq" # OpenAI, Groq
+LLM.model = "llama-3.1-70b-versatile" # whatever is available, idk
+
+TTS.service = "elevenlabs" # openai, elevenlabs, Google
 
 
-tts.openai.voice = "shimmer"
-tts.openai.model = "tts-1" # can be changed to "tts-1" to lower cost
+# Fallback services
+# Used if main one fails. Especially important for apis with quotas like elevenlabs
+fallback.LLM.service = "OpenAI"
+fallback.LLM.model = "gpt-4o-mini"
 
-tts.elevenlabs.voice = "Sarah" # voice has to be available in your account
-tts.elevenlabs.model = "eleven_multilingual_v2" 
+fallback.TTS.service = "openai"
 
-tts.google.voice = "de-DE-Wavenet-A" # pay attention to the language support of the voice!
+# TTS service specific config
+
+TTS.openai.voice = "shimmer"
+TTS.openai.model = "tts-1" # can be changed to "tts-1" for lower cost or hd for better quality
+
+TTS.elevenlabs.voice = "EXAVITQu4vr4xnSDxMaL" # voice has to be available in your account!
+TTS.elevenlabs.model = "eleven_multilingual_v2" 
+
+TTS.google.voice = "de-DE-Wavenet-A" # pay attention to the language support of the voice!
+
+
 
 # max length for command arguments
 max_arg_length = 50
@@ -39,6 +47,9 @@ debug = true
 "dramatic" = 8
 "confused" = 5
 "annoyed" = 7
+"very formal" = 10
+"sad sarcastic" = 10
+"highly sarcastic" = 25
 
 # special events that are added to the greeting prompt for chatgpt
 [events]
