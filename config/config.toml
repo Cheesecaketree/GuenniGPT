@@ -5,33 +5,54 @@ language = "german" # not tested with other languages, but should work. write th
 # For example if user left and rejoined the channel
 timeout = 300
 
-# Main TTS Service to use
-# Available options: "google", "openai", "elevenlabs"
-# set up keys depedning on the services you choose!
-tts.main = "elevenlabs"
-
-# Fallback TTS engine to use if the main one fails
-# or quota on the main one is used up (especially important for elevenlabs) 
-# if empty, the main TTS engine will be used, which could fail
-tts.fallback = "openai"
-
-
-tts.openai.voice = "shimmer"
-tts.openai.model = "tts-1" # can be changed to "tts-1" to lower cost
-
-tts.elevenlabs.voice = "Sarah" # voice has to be available in your account
-tts.elevenlabs.model = "eleven_multilingual_v2" 
-
-tts.google.voice = "de-DE-Wavenet-A" # pay attention to the language support of the voice!
-
 # max length for command arguments
 max_arg_length = 50
 
 # spams your console with a bunch of debug messages 
 debug = true
 
+# LLM Config
+[llm]
+service = "Groq" # OpenAI, Groq
+model = "llama-3.1-70b-versatile" # whatever is available, idk
+fallback_service = "OpenAI"
+fallback_model = "gpt-4o-mini"
+
+
+# TTS config
+[tts]
+service = "openai"
+voice = "shimmer"
+model = "tts-1" # tts-1-hd for higher quality and higher cost
+fallback_service = "elevenlabs"
+fallback_voice = "EXAVITQu4vr4xnSDxMaL"
+fallback_model = "eleven_multilingual_v2" 
+
+
+[greeting_prompt]
+time_format = "%I:%M %p"
+date_format = "%A"
+system = """
+You are a Discord Bot that greets people when they enter a voice channel. Only answer in {language}.
+Stick to the instructions!
+Your purpose is to make the experience in the voice channel more fun. Answer in roughly 3 sentences.
+You get a bunch of information. No need to use them all. Just pick what fits best.
+Today is {date}. It is currently {time}"""
+user = """
+Generate a {style} greeting for "{username}" who just entered the Discord voice channel "{channelname}".
+{activity} {other_people} {event}
+"""
+
+
+# split like this to remove parts that may be null (activity or event mainly)
+[greeting_prompt.additions]
+other_people_text = "There are currently {num_other_people} in the channel"
+activity_text = "Their current activity is {activity}."
+
+
+
 # stlyes for the greeting
-[greeting-styles]
+[greeting_prompt.styles]
 "sarcastic" = 25
 "sarcastic and rude" = 25
 "humorous" = 12 
@@ -39,9 +60,13 @@ debug = true
 "dramatic" = 8
 "confused" = 5
 "annoyed" = 7
+"very formal" = 10
+"sad sarcastic" = 10
+"highly sarcastic" = 25
 
 # special events that are added to the greeting prompt for chatgpt
 [events]
+use_events = true
 "31.10" = [
     "Today is Halloween! Be scray!",
     "Today is Halloween!",
