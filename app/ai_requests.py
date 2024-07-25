@@ -15,7 +15,6 @@ def generate_compliment(name):
     language = config["language"]
     
     name = name.split("#")[0]
-    filename = f"rating_{randStr(N=4)}" + ".mp3"
     
     system_message = "You are a discord bot that can talk. You will get the name of a user. Compliment them in a funny and random way. Be creative, be rude. Keep it short. Use the given language"
     user_message = f"Give {name} a compliment.lang={language}"
@@ -25,19 +24,20 @@ def generate_compliment(name):
         {"role": "user", "content": user_message},
     ]
     
-    text = get_chatcompletion(messages, temperature=0.95, max_tokens=256)
+    text = primary_llm.generate_text(messages, max_tokens=256, temperature=0.95)
+    text = remove_emoji.remove_emoji(text).replace('\"', '').replace('\"', '')
+    
     
     logger.debug(f"Generating compliment for {name} with language {language} \nText: {text}")
     
-    voice.generate_audio(text, filename, language)
+    file = primary_tts.generate_speech(text)
     
-    return filename
+    return file
 
 def generate_rating(name):
     language = config["language"]
     
     name = name.split("#")[0]
-    filename = f"rating_{randStr(N=4)}" + ".mp3"
     
     system_message = "You are a discord bot that can talk. You will get the name of a user. Rate them in a funny and random way. Be creative, be rude. For rating on a scale use 'x out of y'. Keep it short."
     user_message = f"{name} wants to be rated.lang={language}"
@@ -47,13 +47,12 @@ def generate_rating(name):
         {"role": "user", "content": user_message},
     ]
     
-    text = get_chatcompletion(messages, temperature=0.95, max_tokens=256)
+    text = primary_llm.generate_text(messages, max_tokens=256, temperature=0.95)
+    text = remove_emoji.remove_emoji(text).replace('\"', '').replace('\"', '')
     
-    logger.debug(f"Generating rating for {name} with language {language} \nText: {text}")
+    file = primary_tts.generate_speech(text)
     
-    voice.generate_audio(text, filename, language)
-    
-    return filename
+    return file
     
     
 def generate_greeting(user, channel):
@@ -101,7 +100,7 @@ def generate_greeting(user, channel):
     
     try:
         text = primary_llm.generate_text(messages, max_tokens=1024)
-        text = remove_emoji(text)
+        text = remove_emoji.remove_emoji(text).replace('\"', '').replace('\"', '')
 
     
     except Exception as e:
@@ -125,7 +124,6 @@ def get_random_event_today():
 # Wishes the user a good night
 def generate_good_night(user):
     language = config["language"]
-    filename = f"good_night_{randStr(N=4)}" + ".mp3"
     
     name = user.name
     styles = ["funny", "creative", "poetic"]
@@ -139,23 +137,11 @@ def generate_good_night(user):
         {"role": "user", "content": usr_message},
     ]
     
-    text = get_chatcompletion(messages, temperature=1, max_tokens=256)
+    text = primary_llm.generate_text(messages, max_tokens=1024)
+    text = remove_emoji.remove_emoji(text).replace('\"', '').replace('\"', '')
     logger.debug(f"generated greeting text: {text}")
     
-    voice.generate_audio(text, filename, language)
+    file = primary_tts.generate_speech(text)
     
-    return filename
+    return file
     
-
-def get_chatcompletion(messages, temperature=1, max_tokens=256):
-    logger.debug(f"requesting chatcompletion for message: {messages}")
-    response = openai.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=messages,
-        temperature=temperature,
-        max_tokens=max_tokens,
-    )
-    response_message = response.choices[0].message.content
-    response_message = remove_emoji.remove_emoji(response_message).replace('\"', '').replace('\"', '')
-    return response_message
-
