@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-import io
 
 from central_logger import logger
 import asyncio
@@ -11,6 +10,9 @@ import ai_requests as ai
 import channel_queue
 import background_utils as utils
 import user_activity
+
+import tempfile
+import os
 
 
 lang = config["language"]
@@ -56,9 +58,9 @@ async def on_voice_state_update(member, before, after):
             logger.info(f"{username} recently joined {channel_name}")
         else:
             # generates audio and plays it
-            file = ai.generate_greeting(user=member, channel=channel)
+            file_path = ai.generate_greeting(user=member, channel=channel)
             try:
-                await play_audio(file, member)
+                await play_audio(file_path, member)
                 
             except Exception as e:
                 logger.error(f"Error playing audio file: {e}")
@@ -210,8 +212,8 @@ async def create_connection(member):
     
 # enqueues the file and plays it 
 # file is a byte stream object
-async def play_audio(file, member):    
-    channel_queue.enqueue(file, channel_name=member.voice.channel.name)
+async def play_audio(file_path, member):
+    channel_queue.enqueue(file_path, channel_name=member.voice.channel.name)
     
     await create_connection(member)
 
@@ -221,32 +223,31 @@ async def play_audio(file, member):
     channel_name = member.voice.channel.name
     queue_index = channel_queue.get_channel_pos(channel_name)
 
-    while True:
-        await create_connection(member)
-        
-        queue_file = channel_queue.dequeue(queue_index)
-        
-        
-        if member.voice is not None:
-            audio_stream = io.BytesIO(queue_file)
-            
-            ffmpeg_audio = discord.FFmpegPCMAudio(audio_stream, pipe=True)
-            
-            voice_connection.play(ffmpeg_audio, after=lambda e: print(f"Player error: {e}") if e else None)
-            
-            while voice_connection.is_playing():
-                await asyncio.sleep(1)
-                
-            await voice_connection.disconnect()
-        voice_connection.cleanup() 
-        
-        channel_queue.queues[queue_index].done()
+
+    await create_connection(member)
+    queue_file_path = channel_queue.dequeue(queue_index)
     
-        if channel_queue.queues[queue_index].isEmpty():
-            logger.debug("Queue is empty. Bot has disconnected.")
-            return
-        logger.debug("Queue not empty. Bot is playing next file")
+    if member.voice is not None:
+
+        ffmpeg_audio = discord.FFmpegPCMAudio(queue_file_path)
         
+            
+        voice_connection.play(ffmpeg_audio)
         
-token = config['keys']["discord"]
+        while voice_connection.is_playing():
+            await asyncio.sleep(1)
+        
+        if not channel_queue.queues[queue_index].isEmpty():
+                next_file = channel_queue.dequeue(queue_index)
+                asyncio.create_task(play_audio(next_file, member))
+                return
+        
+        await voice_connection.disconnect()
+        voice_connection.cleanup()
+        os.remove(queue_file_path)
+        channel_queue.queues[queue_index].done()
+        
+            
+        
+token = config['keys']['discord']
 bot.run(token)

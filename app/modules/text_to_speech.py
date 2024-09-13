@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from openai import OpenAI
 from elevenlabs.client import ElevenLabs
 import io
+import tempfile
 
 # Abstract Class for LLM
 class TextToSpeechEngine():
@@ -28,9 +29,12 @@ class OpenAITTS(TextToSpeechEngine):
             
             raise e
     
-        audio_data = response.content
     
-        return audio_data
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as temp_audio_file:
+            temp_audio_file.write(response.content)
+            temp_audio_file_path = temp_audio_file.name       
+
+        return temp_audio_file_path
 
 
 class ElevenlabsTTS(TextToSpeechEngine):
@@ -61,7 +65,6 @@ class ElevenlabsTTS(TextToSpeechEngine):
             raise ValueError(f"Elevenlabs TTS quota exceeded: {used}/{limit} characters used")
         
         
-        
     def generate_speech(self, input: str, **kwargs) -> str:
         self.check_quota(input)
         
@@ -84,7 +87,11 @@ class ElevenlabsTTS(TextToSpeechEngine):
                 
         audio_stream.seek(0)
     
-        return audio_stream
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as temp_audio_file:
+            temp_audio_file.write(response.content)
+            temp_audio_file_path = temp_audio_file.name       
+
+        return temp_audio_file_path
         
     
     

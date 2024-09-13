@@ -30,9 +30,9 @@ def generate_compliment(name):
     
     logger.debug(f"Generating compliment for {name} with language {language} \nText: {text}")
     
-    file = primary_tts.generate_speech(text)
+    file_path = primary_tts.generate_speech(text)
     
-    return file
+    return file_path
 
 def generate_rating(name):
     language = config["language"]
@@ -50,9 +50,9 @@ def generate_rating(name):
     text = primary_llm.generate_text(messages, max_tokens=256, temperature=0.95)
     text = remove_emoji.remove_emoji(text).replace('\"', '').replace('\"', '')
     
-    file = primary_tts.generate_speech(text)
+    file_path = primary_tts.generate_speech(text)
     
-    return file
+    return file_path
     
     
 def generate_greeting(user, channel):
@@ -108,9 +108,9 @@ def generate_greeting(user, channel):
         logger.error(f"Error generating chat completion: {e}")
         text = f"Hey {username}!"
     
-    file = primary_tts.generate_speech(text)
+    file_path = primary_tts.generate_speech(text)
     
-    return file
+    return file_path
 
 # Returns a random greeting style from the config
 def get_random_greeting_style():
