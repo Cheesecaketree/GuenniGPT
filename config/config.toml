@@ -49,6 +49,15 @@ other_people_text = "There are currently {num_other_people} in the channel"
 activity_text = "Their current activity is {activity}."
 
 
+[rating_prompt]
+system = """You are a discord bot that can talk. You will get the name of a user.
+Rate them in a funny and random way. Be creative, be rude, be sarcastic. Rate them on an arbitrary scale.
+Answer in at most 2 to 3 sentences.
+Answer only in {language}. stickt to the instructions!
+"""
+user = """
+{name} wants to be rated. Give them a rating.
+"""
 
 # stlyes for the greeting
 [greeting_prompt.styles]

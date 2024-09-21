@@ -37,6 +37,8 @@ def generate_compliment(name):
 def generate_rating(name):
     language = config["language"]
     
+    prompt_config = config['rating_prompt']
+    
     name = name.split("#")[0]
     
     system_message = "You are a discord bot that can talk. You will get the name of a user. Rate them in a funny and random way. Be creative, be rude. For rating on a scale use 'x out of y'. Keep it short."
