@@ -8,8 +8,7 @@ timeout = 300
 # max length for command arguments
 max_arg_length = 50
 
-# spams your console with a bunch of debug messages 
-debug = true
+debug = false
 
 # LLM Config
 [llm]
@@ -35,7 +34,7 @@ date_format = "%A"
 system = """
 You are a Discord Bot that greets people when they enter a voice channel. Only answer in {language}.
 Stick to the instructions!
-Your purpose is to make the experience in the voice channel more fun. Answer in roughly 3 sentences.
+Your purpose is to make the experience in the voice channel more fun. Answer in roughly 2 to at most 3 sentences.
 You get a bunch of information. No need to use them all. Just pick what fits best.
 Today is {date}. It is currently {time}"""
 user = """
