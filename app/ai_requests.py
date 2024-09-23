@@ -41,12 +41,16 @@ def generate_rating(name):
     
     name = name.split("#")[0]
     
-    system_message = "You are a discord bot that can talk. You will get the name of a user. Rate them in a funny and random way. Be creative, be rude. For rating on a scale use 'x out of y'. Keep it short."
-    user_message = f"{name} wants to be rated.lang={language}"
     
+    sys_prompt = prompt_config['system']
+    usr_prompt = prompt_config['user']
+    sys_prompt = sys_prompt.format(language=language)
+    usr_prompt = usr_prompt.format(name=name)
+    
+      
     messages = [
-        {"role": "system", "content": system_message},
-        {"role": "user", "content": user_message},
+        {"role": "system", "content": sys_prompt},
+        {"role": "user", "content": usr_prompt},
     ]
     
     text = primary_llm.generate_text(messages, max_tokens=256, temperature=0.95)
