@@ -14,8 +14,8 @@ debug = false
 [llm]
 service = "Groq" # OpenAI, Groq
 model = "llama-3.1-70b-versatile" # whatever is available, idk
-fallback_service = "OpenAI"
-fallback_model = "gpt-4o-mini"
+fallback_service = "OpenAI" # NOT IMPLEMENTED
+fallback_model = "gpt-4o-mini" # NOT IMPLEMENTED
 
 
 # TTS config
@@ -23,9 +23,9 @@ fallback_model = "gpt-4o-mini"
 service = "openai"
 voice = "shimmer"
 model = "tts-1" # tts-1-hd for higher quality and higher cost
-fallback_service = "elevenlabs"
-fallback_voice = "EXAVITQu4vr4xnSDxMaL"
-fallback_model = "eleven_multilingual_v2" 
+fallback_service = "elevenlabs" # NOT IMPLEMENTED
+fallback_voice = "EXAVITQu4vr4xnSDxMaL" # NOT IMPLEMENTED
+fallback_model = "eleven_multilingual_v2" # NOT IMPLEMENTED
 
 
 [greeting_prompt]
@@ -42,22 +42,10 @@ Generate a {style} greeting for "{username}" who just entered the Discord voice 
 {activity} {other_people} {event}
 """
 
-
-# split like this to remove parts that may be null (activity or event mainly)
+# additional text for the greeting
 [greeting_prompt.additions]
 other_people_text = "There are currently {num_other_people} in the channel"
 activity_text = "Their current activity is {activity}."
-
-
-[rating_prompt]
-system = """You are a discord bot that can talk. You will get the name of a user.
-Rate them in a funny and random way. Be creative, be rude, be sarcastic. Rate them on an arbitrary scale.
-Answer in at most 2 to 3 sentences.
-Answer only in {language}. stickt to the instructions!
-"""
-user = """
-{name} wants to be rated. Give them a rating.
-"""
 
 # stlyes for the greeting
 [greeting_prompt.styles]
@@ -71,6 +59,37 @@ user = """
 "very formal" = 10
 "sad sarcastic" = 10
 "highly sarcastic" = 25
+
+
+[rating_prompt]
+system = """You are a discord bot that can talk. You will get the name of a user.
+Rate them in a funny and random way. Be creative, be rude, be sarcastic. Rate them on an arbitrary scale.
+Answer in at most 2 to 3 sentences.
+Answer only in {language}. stickt to the instructions!
+"""
+user = """
+{name} wants to be rated. Give them a rating.
+"""
+
+
+[compliment_prompt]
+system = """
+You are a discord bot that can talk. You will get the name of a user. Compliment them in a funny and random way. Be creative, be rude. Keep it short. Only answer in {language}. Stick to the instructions!
+"""
+user = """
+Give {name} a compliment.
+"""
+
+
+[good_night_prompt]
+system = """
+You are a talking Discord Bot. Wish the given user a good night. Only answer in {language}. Stick to the instructions!
+"""
+user = """
+Wish {name} a good night. Be {style}.
+"""
+styles = ["sarcastic", "formal", "dramatic", "poetic"]
+
 
 # special events that are added to the greeting prompt for chatgpt
 [events]

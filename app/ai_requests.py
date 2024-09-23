@@ -14,14 +14,18 @@ openai.organization = config['keys']["openai-org"]
 def generate_compliment(name):
     language = config["language"]
     
+    prompt_config = config['compliment_prompt']
+    
     name = name.split("#")[0]
     
-    system_message = "You are a discord bot that can talk. You will get the name of a user. Compliment them in a funny and random way. Be creative, be rude. Keep it short. Use the given language"
-    user_message = f"Give {name} a compliment.lang={language}"
+    sys_prompt = prompt_config['system']
+    usr_prompt = prompt_config['user']
+    sys_prompt = sys_prompt.format(language=language)
+    usr_prompt = usr_prompt.format(name=name)
     
     messages = [
-        {"role": "system", "content": system_message},
-        {"role": "user", "content": user_message},
+        {"role": "system", "content": sys_prompt},
+        {"role": "user", "content": usr_prompt},
     ]
     
     text = primary_llm.generate_text(messages, max_tokens=256, temperature=0.95)
@@ -131,16 +135,20 @@ def get_random_event_today():
 def generate_good_night(user):
     language = config["language"]
     
+    prompt_config = config['good_night_prompt']
+    
     name = user.name
-    styles = ["funny", "creative", "poetic"]
+    styles = prompt_config['styles']
     
     
-    sys_message = f"Wish a person in a Discord voice channel a good night. Be {random.choices(styles)}. Always answer in {language} and keep it under three sentences."
-    usr_message = f"Wish {name} a good night."
+    sys_prompt = prompt_config['system']
+    usr_prompt = prompt_config['user']
+    sys_prompt = sys_prompt.format(language=language)
+    usr_prompt = usr_prompt.format(name=name, style=random.choice(styles))
     
     messages = [
-        {"role": "system", "content": sys_message},
-        {"role": "user", "content": usr_message},
+        {"role": "system", "content": sys_prompt},
+        {"role": "user", "content": usr_prompt},
     ]
     
     text = primary_llm.generate_text(messages, max_tokens=1024)
