@@ -26,8 +26,3 @@ primary_llm = factory.create_language_model(load_config())
 
 primary_tts = factory.create_text_to_speech_engine(load_config())
 fallback_tts = NotImplemented
-
-
-# from pprint import pprint
-
-# pprint(config)
