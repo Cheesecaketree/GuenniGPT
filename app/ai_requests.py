@@ -29,7 +29,7 @@ def generate_compliment(name):
     ]
     
     text = primary_llm.generate_text(messages, max_tokens=256, temperature=0.95)
-    text = remove_emoji.remove_emoji(text).replace('\"', '').replace('\"', '')
+    text = text_cleanup(text)
     
     
     logger.debug(f"Generating compliment for {name} with language {language} \nText: {text}")
@@ -58,7 +58,7 @@ def generate_rating(name):
     ]
     
     text = primary_llm.generate_text(messages, max_tokens=256, temperature=0.95)
-    text = remove_emoji.remove_emoji(text).replace('\"', '').replace('\"', '')
+    text = text_cleanup(text)
     
     file_path = primary_tts.generate_speech(text)
     
@@ -110,7 +110,7 @@ def generate_greeting(user, channel):
     
     try:
         text = primary_llm.generate_text(messages, max_tokens=1024)
-        text = remove_emoji.remove_emoji(text).replace('\"', '').replace('\"', '')
+        text = text_cleanup(text)
 
     
     except Exception as e:
@@ -152,10 +152,14 @@ def generate_good_night(user):
     ]
     
     text = primary_llm.generate_text(messages, max_tokens=1024)
-    text = remove_emoji.remove_emoji(text).replace('\"', '').replace('\"', '')
+    text = text_cleanup(text)
     logger.debug(f"generated greeting text: {text}")
     
     file = primary_tts.generate_speech(text)
     
     return file
     
+
+def text_cleanup(text):
+    text = remove_emoji.remove_emoji(text).replace('\"', '')
+    return text

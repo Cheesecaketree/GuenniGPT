@@ -16,7 +16,7 @@ def get_user_recently_left(channel, member):
     return True
 
 def set_user_recently_left(channel, member):
-    logger.info(f"set_user_recently_left: {channel} {member} {time.time()}")
+    logger.debug(f"set_user_recently_left: {channel} {member} {time.time()}")
     if channel not in user_last_leave:
         user_last_leave[channel] = {}
     user_last_leave[channel][member] = time.time()

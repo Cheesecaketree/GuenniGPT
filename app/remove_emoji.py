@@ -22,7 +22,3 @@ def remove_emoji(string):
                            "]+", flags=re.UNICODE)
     return emoji_pattern.sub(r'', string)
 
-if __name__ == '__main__':
-    text = open(sys.argv[1]).read()
-    text = remove_emoji(text)
-    print(text)
