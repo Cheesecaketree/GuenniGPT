@@ -13,7 +13,7 @@ debug = false
 # LLM Config
 [llm]
 service = "Groq" # OpenAI, Groq
-model = "llama-3.1-70b-versatile" # whatever is available, idk
+model = "llama-3.3-70b-versatile" # whatever is available, idk
 fallback_service = "OpenAI" # NOT IMPLEMENTED
 fallback_model = "gpt-4o-mini" # NOT IMPLEMENTED
 
