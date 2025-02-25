@@ -44,7 +44,7 @@ Generate a {style} greeting for "{username}" who just entered the Discord voice 
 
 # additional text for the greeting
 [greeting_prompt.additions]
-other_people_text = "There are currently {num_other_people} in the channel"
+other_people_text = "There are now {num_people_in_channel} in the channel"
 activity_text = "Their current activity is {activity}."
 
 # stlyes for the greeting

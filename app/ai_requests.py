@@ -83,13 +83,13 @@ def generate_greeting(user, channel):
     if not type(user) == str:
         activity = user.activity if user.activity else None
         
-    num_other_people = len(channel.members) - 1 
+    num_people_in_channel = len(channel.members) # total number of people in the channel, including the newly joined user
     
     event = get_random_event_today() if config['events']['use_events'] else ""
     style = get_random_greeting_style()
   
     
-    other_people_text = additions['other_people_text'].format(num_other_people=num_other_people)
+    other_people_text = additions['other_people_text'].format(num_other_people=num_people_in_channel)
     activity_text = additions['activity_text'].format(activity=activity) if activity else ""
     
     
