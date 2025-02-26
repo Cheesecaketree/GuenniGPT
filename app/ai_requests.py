@@ -89,7 +89,7 @@ def generate_greeting(user, channel):
     style = get_random_greeting_style()
   
     
-    other_people_text = additions['other_people_text'].format(num_other_people=num_people_in_channel)
+    other_people_text = additions['other_people_text'].format(num_people_in_channel=num_people_in_channel)
     activity_text = additions['activity_text'].format(activity=activity) if activity else ""
     
     
