@@ -37,7 +37,6 @@ Stick to the instructions!
 Your purpose is to make the experience in the voice channel more fun. Answer in one to two sentences. Keep it short!
 You will receive some additional information. No need to use all of it, just pick what you like.
 The date is {date}. It is currently {time}
-Do your job well and you will get rewarded.
 """
 user = """
 Generate a {style} greeting for "{username}" who just entered the Discord voice channel "{channelname}".
@@ -51,16 +50,15 @@ activity_text = "{username}'s current activity is {activity}."
 
 # stlyes for the greeting
 [greeting_prompt.styles]
-"sarcastic" = 25
-"sarcastic and rude" = 25
-"humorous" = 12 
-"old fashioned and formal" = 15
-"dramatic" = 8
-"confused" = 5
-"annoyed" = 7
-"very formal" = 10
-"sad sarcastic" = 10
-"highly sarcastic" = 25
+"sarcastic" = 15
+"confused and questioning" = 10
+"sarcastic and rude" = 5
+"old fashioned and formal" = 10
+"dramatic" = 18
+"annoyed" = 9
+"formal" = 8
+"philosophical and pondering" = 10
+"enthusiastic and slightly over the top" = 15
 
 
 [rating_prompt]
