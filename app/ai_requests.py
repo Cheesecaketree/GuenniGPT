@@ -90,7 +90,7 @@ def generate_greeting(user, channel):
   
     
     other_people_text = additions['other_people_text'].format(num_people_in_channel=num_people_in_channel)
-    activity_text = additions['activity_text'].format(activity=activity) if activity else ""
+    activity_text = additions['activity_text'].format(activity=activity, username=username) if activity else ""
     
     
     sys_prompt = prompt_config['system'].format(date=date, time=time_str, language=language)
